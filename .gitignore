@@ -1,0 +1,67 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### 前端项目（smart-community-admin） ###
+smart-community-admin/node_modules/
+smart-community-admin/dist/
+smart-community-admin/.DS_Store
+smart-community-admin/.env.local
+smart-community-admin/.env.development.local
+smart-community-admin/.env.production.local
+smart-community-admin/.env.test.local
+smart-community-admin/*.log
+smart-community-admin/.gitignore
+smart-community-admin/.editorconfig
+smart-community-admin/.eslintrc.cjs
+smart-community-admin/.prettierrc
+smart-community-admin/vite.config.ts
+smart-community-admin/package-lock.json  # 可选：若不需要跟踪依赖锁文件
+smart-community-admin/yarn-error.log
+
+### 其他通用忽略规则 ###
+*.log
+*.cache
+*.swp
+*.tmp
+*.bak
+*.DS_Store
+.Thumbs.db
+__pycache__/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.7z

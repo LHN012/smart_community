@@ -1,0 +1,17 @@
+-- 创建用户表
+CREATE TABLE IF NOT EXISTS users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    role INT NOT NULL DEFAULT 1 COMMENT '1:普通用户 2:管理员 3:超级管理员',
+    email VARCHAR(100),
+    phone_number VARCHAR(20),
+    real_name VARCHAR(50) COMMENT '真实姓名',
+    address VARCHAR(200) COMMENT '住址',
+    avatar VARCHAR(255) COMMENT '头像URL',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+-- 删除用户档案表
+DROP TABLE IF EXISTS user_profile; 
