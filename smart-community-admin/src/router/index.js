@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import AdminManagement from '../components/AdminManagement.vue';
 import HouseManagement from '../components/HouseManagement.vue';
 import Login from '../components/Login.vue';
-import PropertyManagement from '../components/UserManagement.vue';
 
 const routes = [
   {
@@ -25,12 +24,6 @@ const routes = [
     name: 'HouseManagement',
     component: HouseManagement,
     meta: { requiresAuth: true }
-  },
-  {
-    path: '/property',
-    name: 'PropertyManagement',
-    component: PropertyManagement,
-    meta: { requiresAuth: true }
   }
 ];
 
@@ -43,14 +36,10 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-
+  
   if (to.path === '/login') {
     if (token && user.userId) {
-      if (user.role === 2) {
-        next('/property');
-      } else {
-        next('/admin');
-      }
+      next('/admin');
     } else {
       next();
     }
@@ -63,4 +52,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-export default router;
+export default router; 

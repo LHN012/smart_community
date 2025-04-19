@@ -4,20 +4,20 @@
       <h2>管理系统登录</h2>
       <div class="form-group">
         <label>用户名</label>
-        <input
-            v-model="username"
-            type="text"
-            placeholder="请输入用户名"
-            @keyup.enter="handleLogin"
+        <input 
+          v-model="username" 
+          type="text" 
+          placeholder="请输入用户名"
+          @keyup.enter="handleLogin"
         />
       </div>
       <div class="form-group">
         <label>密码</label>
-        <input
-            v-model="password"
-            type="password"
-            placeholder="请输入密码"
-            @keyup.enter="handleLogin"
+        <input 
+          v-model="password" 
+          type="password" 
+          placeholder="请输入密码"
+          @keyup.enter="handleLogin"
         />
       </div>
       <button class="login-btn" @click="handleLogin">登录</button>
@@ -50,17 +50,13 @@ const handleLogin = async () => {
       const { token, user } = response.data.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      if (user.role === 2) {
-        router.push('/property');
-      } else {
-        router.push('/admin');
-      }
+      router.push('/admin');
     } else {
       alert(response.data?.msg || '登录失败');
     }
   } catch (error) {
     console.error('登录失败:', error);
-    alert(error.response?.data?.msg || '登录失败，请稍后重试');
+    alert('登录失败：' + (error.response?.data?.msg || error.message));
   }
 };
 </script>
@@ -70,43 +66,62 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: #f5f6fa;
 }
 
 .login-box {
-  width: 300px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-label {
+.form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 500;
 }
 
-input {
+.form-group input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3498db;
 }
 
 .login-btn {
   width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: #fff;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .login-btn:hover {
-  background-color: #0056b3;
+  background-color: #2980b9;
 }
-</style>
+</style> 
