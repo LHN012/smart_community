@@ -41,13 +41,15 @@ const handleLogin = async () => {
   }
 
   try {
-    const response = await api.post('/auth/login', {
+    const response = await api.post('/api/auth/login', {
       username: username.value,
       password: password.value
     });
 
     if (response.data && response.data.code === 200) {
-      localStorage.setItem('token', response.data.data);
+      const { token, user } = response.data.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
       router.push('/admin');
     } else {
       alert(response.data?.msg || '登录失败');

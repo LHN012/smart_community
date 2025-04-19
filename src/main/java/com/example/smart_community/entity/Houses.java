@@ -14,14 +14,11 @@ import java.math.BigDecimal;
  * @CreateTime:2025/4/18 14:00
  */
 
-@TableName("Houses")
+@TableName("houses")
 @Data
 public class Houses {
     @TableId(value = "house_id", type = IdType.AUTO)
     private Integer houseId;
-
-    @TableField("unit_id")
-    private Integer unitId;
 
     @TableField("area_id")
     private Integer areaId;
@@ -29,17 +26,18 @@ public class Houses {
     @TableField("building_id")
     private Integer buildingId;
 
+    @TableField("unit_id")
+    private Integer unitId;
+
     @TableField("name")
-    private String houseName;
+    private String name;
+
+    @TableField("price")
+    private Double price;
 
     @TableField("size")
     private Double size;
 
     @TableField("balance")
     private Double balance;
-
-    @TableField("price")
-    private Double pricePerSqm;
-
-
 }

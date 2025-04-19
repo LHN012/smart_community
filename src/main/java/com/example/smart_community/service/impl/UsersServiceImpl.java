@@ -21,23 +21,22 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public Users getByUsername(String username) {
-        logger.info("尝试查询用户: {}", username);
+        logger.info("根据用户名查询用户: {}", username);
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
-        Users user = this.getOne(queryWrapper);
-        if (user != null) {
-            logger.info("找到用户: {}, ID: {}", username, user.getUserId());
-        } else {
-            logger.warn("未找到用户: {}", username);
-        }
+        Users user = getOne(queryWrapper);
+        logger.info("查询结果: {}", user);
         return user;
     }
 
     @Override
     public List<Users> listAdmins() {
+        logger.info("查询管理员列表");
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
-        queryWrapper.gt("role", 1);  // 只查询管理员和超级管理员
-        return list(queryWrapper);
+        queryWrapper.in("role", 2, 3);  // 2=管理员, 3=超级管理员
+        List<Users> admins = list(queryWrapper);
+        logger.info("查询到{}个管理员", admins.size());
+        return admins;
     }
 
     @Override

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.smart_community.mapper.BuildingsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.smart_community.entity.Buildings">
+        <id column="building_id" property="buildingId" />
+        <result column="name" property="name" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        building_id, name
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM buildings
+        WHERE building_id = #{id}
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM buildings
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.example.smart_community.entity.Buildings" useGeneratedKeys="true" keyProperty="buildingId">
+        INSERT INTO buildings
+        (name)
+        VALUES
+        (#{name})
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateById" parameterType="com.example.smart_community.entity.Buildings">
+        UPDATE buildings
+        SET name = #{name}
+        WHERE building_id = #{buildingId}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteById">
+        DELETE FROM buildings
+        WHERE building_id = #{id}
+    </delete>
+</mapper> 

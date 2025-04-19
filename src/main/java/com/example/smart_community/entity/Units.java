@@ -1,5 +1,8 @@
 package com.example.smart_community.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -10,9 +13,11 @@ import javax.persistence.*;
  * @CreateTime:2025/4/18 14:00
  */
 @Data
-@TableName("Units")
+@TableName("units")
 public class Units {
+    @TableId(value = "unit_id", type = IdType.AUTO)
     private Integer unitId;
-    private Integer buildingId;
-    private String unitNo;
+
+    @TableField("name")
+    private String name;
 }

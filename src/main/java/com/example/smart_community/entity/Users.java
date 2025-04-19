@@ -45,7 +45,4 @@ public class Users {
     
     @TableField("created_at")
     private LocalDateTime createdAt;
-    
-    @TableField("updated_at")
-    private LocalDateTime updatedAt;
 }

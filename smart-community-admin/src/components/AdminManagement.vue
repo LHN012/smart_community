@@ -21,6 +21,7 @@
         <thead>
           <tr>
             <th>ID</th>
+            <th>头像</th>
             <th>用户名</th>
             <th>真实姓名</th>
             <th>邮箱</th>
@@ -33,6 +34,15 @@
         <tbody>
           <tr v-for="admin in filteredAdmins" :key="admin.userId">
             <td>{{ admin.userId }}</td>
+            <td>
+              <img 
+                v-if="admin.avatar" 
+                :src="admin.avatar" 
+                class="avatar-img"
+                alt="用户头像"
+              />
+              <span v-else>无头像</span>
+            </td>
             <td>{{ admin.username }}</td>
             <td>{{ admin.realName }}</td>
             <td>{{ admin.email }}</td>
@@ -199,7 +209,7 @@ const handleSubmit = async () => {
       if (!currentAdmin.value.password) {
         delete currentAdmin.value.password;
       }
-      const response = await api.put(`/api/admin/${currentAdmin.value.userId}`, currentAdmin.value);
+      const response = await api.put(`/api/admin/update/${currentAdmin.value.userId}`, currentAdmin.value);
       if (response.data.code === 200) {
         alert('更新成功！');
         await fetchAdmins();
@@ -223,7 +233,7 @@ const handleDelete = async (userId) => {
   if (!confirm('确定要删除该管理员吗？')) return;
   
   try {
-    const response = await api.delete(`/api/admin/${userId}`);
+    const response = await api.delete(`/api/admin/delete/${userId}`);
     if (response.data.code === 200) {
       alert('删除成功！');
       await fetchAdmins();
@@ -272,21 +282,22 @@ onMounted(() => {
 }
 
 .search-bar input {
-  width: 300px;
+  width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
 .table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
@@ -300,40 +311,29 @@ th {
   font-weight: 600;
 }
 
-.add-btn, .edit-btn, .delete-btn {
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.edit-btn, .delete-btn {
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-right: 5px;
-}
-
-.add-btn {
-  background-color: #4CAF50;
-  color: white;
+  margin-right: 8px;
 }
 
 .edit-btn {
-  background-color: #2196F3;
+  background-color: #3498db;
   color: white;
 }
 
 .delete-btn {
-  background-color: #f44336;
+  background-color: #e74c3c;
   color: white;
-}
-
-.logout-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #ff5722;
-  color: white;
-}
-
-.logout-btn:hover {
-  background-color: #f4511e;
 }
 
 .dialog-overlay {
@@ -346,6 +346,7 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .dialog {
@@ -363,7 +364,6 @@ th {
 .form-group label {
   display: block;
   margin-bottom: 5px;
-  font-weight: 500;
 }
 
 .form-group input,
@@ -381,7 +381,8 @@ th {
   margin-top: 20px;
 }
 
-.cancel-btn, .submit-btn {
+.cancel-btn,
+.submit-btn {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -389,11 +390,30 @@ th {
 }
 
 .cancel-btn {
-  background-color: #f5f5f5;
+  background-color: #95a5a6;
+  color: white;
 }
 
 .submit-btn {
-  background-color: #4CAF50;
+  background-color: #2ecc71;
+  color: white;
+}
+
+.add-btn,
+.logout-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-btn {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.logout-btn {
+  background-color: #e74c3c;
   color: white;
 }
 </style>

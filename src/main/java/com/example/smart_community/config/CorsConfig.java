@@ -20,6 +20,7 @@ public class CorsConfig {
         config.addAllowedHeader("*");
         // 允许的请求方法
         config.addAllowedMethod("*");
+
         // 允许暴露的响应头
         config.addExposedHeader("Authorization");
 

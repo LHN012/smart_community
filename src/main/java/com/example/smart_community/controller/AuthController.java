@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -43,23 +43,27 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Users user) {
-        logger.info("收到登录请求 - 用户名: {}, 密码长度: {}", 
-            user.getUsername(), 
-            user.getPassword() != null ? user.getPassword().length() : 0);
-            
+        logger.info("收到登录请求 - 用户名: {}, 密码: {}", user.getUsername(), user.getPassword());
+        
         try {
             // 验证用户名和密码
+            logger.info("开始验证用户身份...");
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            logger.info("用户身份验证成功");
             
             // 生成token
+            logger.info("开始生成token...");
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
             String token = jwtTokenUtil.generateToken(userDetails);
+            logger.info("token生成成功");
             
             // 获取用户信息
+            logger.info("开始获取用户信息...");
             Users userInfo = usersService.getByUsername(user.getUsername());
+            logger.info("用户信息获取成功: {}", userInfo);
             
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);

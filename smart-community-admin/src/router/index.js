@@ -38,13 +38,13 @@ router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
   if (to.path === '/login') {
-    if (token && user.id) {
+    if (token && user.userId) {
       next('/admin');
     } else {
       next();
     }
   } else {
-    if (token && user.id) {
+    if (token && user.userId) {
       next();
     } else {
       next('/login');

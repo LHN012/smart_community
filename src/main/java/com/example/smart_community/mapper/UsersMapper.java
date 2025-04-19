@@ -8,7 +8,9 @@ package com.example.smart_community.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.smart_community.entity.Users;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface UsersMapper extends BaseMapper<Users> {
     @Select("SELECT * FROM Users WHERE username = #{username}")
     Users selectByUsername(String username);

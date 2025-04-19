@@ -1,6 +1,6 @@
 package com.example.smart_community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.smart_community.entity.Houses;
 import com.example.smart_community.mapper.HousesMapper;
@@ -14,15 +14,42 @@ public class HousesServiceImpl extends ServiceImpl<HousesMapper, Houses> impleme
 
     @Override
     public List<Houses> getHousesByUnitId(Integer unitId) {
-        QueryWrapper<Houses> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("unitId", unitId);
-        return this.list(queryWrapper);
+        LambdaQueryWrapper<Houses> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Houses::getUnitId, unitId);
+        return list(wrapper);
     }
 
     @Override
-    public boolean isHouseNoUniqueInUnit(Integer unitId, String houseNo) {
-        QueryWrapper<Houses> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("unitId", unitId).eq("houseNo", houseNo);
-        return this.count(queryWrapper) == 0;
+    public boolean isHouseNameUniqueInUnit(Integer unitId, String name) {
+        LambdaQueryWrapper<Houses> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Houses::getUnitId, unitId)
+               .eq(Houses::getName, name);
+        return count(wrapper) == 0;
+    }
+
+    @Override
+    public List<Houses> getHousesByCondition(String name, Integer unitId) {
+        LambdaQueryWrapper<Houses> wrapper = new LambdaQueryWrapper<>();
+        if (name != null && !name.isEmpty()) {
+            wrapper.like(Houses::getName, name);
+        }
+        if (unitId != null) {
+            wrapper.eq(Houses::getUnitId, unitId);
+        }
+        return list(wrapper);
+    }
+
+    @Override
+    public boolean isAreaExists(Integer areaId) {
+        LambdaQueryWrapper<Houses> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Houses::getAreaId, areaId);
+        return count(wrapper) > 0;
+    }
+
+    @Override
+    public boolean isBuildingExists(Integer buildingId) {
+        LambdaQueryWrapper<Houses> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Houses::getBuildingId, buildingId);
+        return count(wrapper) > 0;
     }
 }    
