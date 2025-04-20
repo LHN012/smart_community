@@ -5,13 +5,20 @@
     </div>
     <nav>
       <ul>
-        <li :class="{ active: currentPath === '/property' }" @click="navigate('/property')">
-          <i class="fa-solid fa-house"></i> 主页
+        <li :class="{ active: currentPath === '/user-management' }" @click="navigate('/user-management')">
+          <i class="fa-solid fa-users"></i>  用户信息管理
         </li>
-        <li :class="{ active: currentPath === '/property/user-management' }" @click="navigate('/property/user-management')">
-          <i class="fa-solid fa-users"></i> 用户信息管理
+        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+          <i class="fa-solid fa-price"></i> 缴费管理模块
         </li>
-        <!-- 可以根据需要添加更多功能模块 -->
+        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+          <i class="fa-solid fa-notice"></i> 通知管理模块
+        </li>
+        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+          <i class="fa-solid fa-repair"></i> 报修管理模块
+        </li>
+
+          <!-- 可以根据需要添加更多功能模块 -->
       </ul>
     </nav>
   </div>
@@ -22,7 +29,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const currentPath = ref('/property');
+const currentPath = ref('/user-management');
 
 const navigate = (path) => {
   currentPath.value = path;

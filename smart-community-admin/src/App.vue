@@ -11,11 +11,11 @@ const userRole = ref(null);
 
 onMounted(() => {
   try {
-    // 从本地存储获取用户角色
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     userRole.value = user.role;
   } catch (error) {
     console.error('解析用户信息出错:', error);
+    userRole.value = null;
   }
 });
 

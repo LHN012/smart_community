@@ -51,7 +51,7 @@ const handleLogin = async () => {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       if (user.role === 2) {
-        router.push('/property');
+        router.push('/user-management');
       } else {
         router.push('/admin');
       }

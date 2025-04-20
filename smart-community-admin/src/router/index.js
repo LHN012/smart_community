@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import AdminManagement from '../components/AdminManagement.vue';
 import HouseManagement from '../components/HouseManagement.vue';
 import Login from '../components/Login.vue';
-import PropertyManagement from '../components/UserManagement.vue';
+import UserManagement from '../components/UserManagement.vue';
 
 const routes = [
   {
@@ -27,9 +27,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/property',
-    name: 'PropertyManagement',
-    component: PropertyManagement,
+    path: '/user-management',
+    name: 'UserManagement',
+    component: UserManagement,
     meta: { requiresAuth: true }
   }
 ];
