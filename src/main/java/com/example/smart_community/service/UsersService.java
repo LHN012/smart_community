@@ -30,4 +30,10 @@ public interface UsersService extends IService<Users> {
     void saveUser(Users user);
 
     List<Users> listAdmins();
+
+    /**
+     * 获取普通用户列表
+     * @return 普通用户列表
+     */
+    List<Users> listNormalUsers();
 }

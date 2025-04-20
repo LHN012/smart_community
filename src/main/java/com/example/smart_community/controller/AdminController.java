@@ -30,6 +30,17 @@ public class AdminController {
         return Result.success(admins);
     }
 
+    @GetMapping("/normal-users")
+    public Result<List<Users>> listNormalUsers() {
+        try {
+            List<Users> users = usersService.listNormalUsers();
+            return Result.success(users);
+        } catch (Exception e) {
+            logger.error("获取普通用户列表失败", e);
+            return Result.error("获取普通用户列表失败: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/check-username/{username}")
     public Result<Boolean> checkUsername(@PathVariable String username) {
         Users user = usersService.getByUsername(username);
@@ -46,6 +57,21 @@ public class AdminController {
         } catch (Exception e) {
             logger.error("创建管理员失败", e);
             return Result.error("创建管理员失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/create-normal-user")
+    public Result<Integer> createNormalUser(@RequestBody Users user) {
+        try {
+            // 设置角色为普通用户
+            user.setRole(1);
+            if (usersService.save(user)) {
+                return Result.success(user.getUserId());
+            }
+            return Result.error("创建普通用户失败");
+        } catch (Exception e) {
+            logger.error("创建普通用户失败", e);
+            return Result.error("创建普通用户失败: " + e.getMessage());
         }
     }
 
@@ -109,6 +135,30 @@ public class AdminController {
         } catch (Exception e) {
             logger.error("删除管理员失败", e);
             return Result.error("删除管理员失败: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete-normal-user/{userId}")
+    public Result<Boolean> deleteNormalUser(@PathVariable Integer userId) {
+        try {
+            // 先检查用户是否存在
+            Users existingUser = usersService.getById(userId);
+            if (existingUser == null) {
+                return Result.error("用户不存在");
+            }
+
+            // 检查是否是普通用户
+            if (existingUser.getRole() != 1) {
+                return Result.error("只能删除普通用户");
+            }
+
+            if (usersService.removeById(userId)) {
+                return Result.success(true);
+            }
+            return Result.error("删除普通用户失败");
+        } catch (Exception e) {
+            logger.error("删除普通用户失败", e);
+            return Result.error("删除普通用户失败: " + e.getMessage());
         }
     }
 }

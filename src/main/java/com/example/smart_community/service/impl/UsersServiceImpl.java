@@ -40,6 +40,16 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
+    public List<Users> listNormalUsers() {
+        logger.info("查询普通用户列表");
+        QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", 1);  // 1=普通用户
+        List<Users> users = list(queryWrapper);
+        logger.info("查询到{}个普通用户", users.size());
+        return users;
+    }
+
+    @Override
     public void saveUser(Users user) {
         // 调用 MyBatis-Plus 的 save 方法保存用户信息
         this.save(user);
