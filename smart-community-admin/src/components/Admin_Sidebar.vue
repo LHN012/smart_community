@@ -8,6 +8,12 @@
         <li :class="{ active: currentPath === '/user-management' }" @click="navigate('/user-management')">
           <i class="fa-solid fa-users"></i>  用户信息管理
         </li>
+        <li :class="{ active: currentPath === '/user-house-management' }" @click="navigate('/user-house-management')">
+          <i class="fa-solid fa-price"></i> 用户房屋绑定信息
+        </li>
+        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+          <i class="fa-solid fa-price"></i> 房屋信息模块
+        </li>
         <li :class="{ active: currentPath === '' }" @click="navigate('')">
           <i class="fa-solid fa-price"></i> 缴费管理模块
         </li>
@@ -18,7 +24,6 @@
           <i class="fa-solid fa-repair"></i> 报修管理模块
         </li>
 
-          <!-- 可以根据需要添加更多功能模块 -->
       </ul>
     </nav>
   </div>

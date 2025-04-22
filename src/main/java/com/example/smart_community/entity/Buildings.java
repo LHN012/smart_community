@@ -1,7 +1,6 @@
 package com.example.smart_community.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,9 +15,8 @@ import lombok.Data;
 @Data
 @TableName("buildings")
 public class Buildings {
-    @TableId(value = "building_id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Integer buildingId;
-
-    @TableField("name")
+    
     private String name;
 }

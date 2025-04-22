@@ -3,6 +3,7 @@ import AdminManagement from '../components/AdminManagement.vue';
 import HouseManagement from '../components/HouseManagement.vue';
 import Login from '../components/Login.vue';
 import UserManagement from '../components/UserManagement.vue';
+import UserHouseManagement from '../components/UserHouseManagement.vue'
 
 const routes = [
   {
@@ -31,6 +32,12 @@ const routes = [
     name: 'UserManagement',
     component: UserManagement,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/user-house-management',
+    name: 'UserHouseManagement',
+    component: UserHouseManagement,
+    meta: { requiresAuth: true }
   }
 ];
 
@@ -47,7 +54,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/login') {
     if (token && user.userId) {
       if (user.role === 2) {
-        next('/property');
+        next('/user-management');
       } else {
         next('/admin');
       }

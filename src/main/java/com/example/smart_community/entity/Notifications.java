@@ -5,17 +5,19 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
 
-/**
- * @Author:LHN
- * @CreateTime:2025/4/18 14:00
- */
 @Data
-@TableName("units")
-public class Units {
+@TableName("notifications")
+public class Notifications {
     @TableId(type = IdType.AUTO)
-    private Integer unitId;
+    private Integer notificationId;
     
-    private String name;
-}
+    private String content;
+    
+    private String type;
+    
+    private String status;
+    
+    private LocalDateTime createdAt;
+} 

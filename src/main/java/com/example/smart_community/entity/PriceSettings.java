@@ -5,17 +5,18 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-/**
- * @Author:LHN
- * @CreateTime:2025/4/18 14:00
- */
 @Data
-@TableName("units")
-public class Units {
+@TableName("pricesettings")
+public class PriceSettings {
     @TableId(type = IdType.AUTO)
-    private Integer unitId;
+    private Integer priceId;
     
-    private String name;
-}
+    private String type;
+    
+    private BigDecimal unitPrice;
+    
+    private LocalDate effectiveDate;
+} 
