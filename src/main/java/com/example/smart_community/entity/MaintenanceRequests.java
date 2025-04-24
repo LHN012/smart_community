@@ -13,13 +13,15 @@ public class MaintenanceRequests {
     @TableId(type = IdType.AUTO)
     private Integer requestId;
     
-    private Integer houseId;
+    private Integer userId;
     
     private String description;
     
     private String status;
     
     private LocalDateTime createdAt;
+    
+    private Integer updateUserId;
     
     private LocalDateTime updatedAt;
 } 

@@ -21,8 +21,8 @@
         <li :class="{ active: currentPath === '/notifications' }" @click="navigate('/notifications')">
           <i class="fa-solid fa-notice"></i> 通知管理模块
         </li>
-        <li :class="{ active: currentPath === '' }" @click="navigate('')">
-          <i class="fa-solid fa-repair"></i> 报修管理模块
+        <li :class="{ active: currentPath === '/maintenance' }" @click="navigate('/maintenance')">
+          <i class="fa-solid fa-repair"></i> 故障报修管理模块
         </li>
 
       </ul>

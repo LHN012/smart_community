@@ -7,6 +7,7 @@ import UserHouseManagement from '../components/UserHouseManagement.vue'
 import HouseInfoManagement from '../components/HouseInfoManagement.vue'
 import TransactionRecords from '../components/TransactionRecords.vue'
 import NotificationManagement from '../components/NotificationManagement.vue'
+import MaintenanceManagement from '../components/MaintenanceManagement.vue'
 
 const routes = [
   {
@@ -58,6 +59,12 @@ const routes = [
     path: '/notifications',
     name: 'NotificationManagement',
     component: NotificationManagement
+  },
+  {
+    path: '/maintenance',
+    name: 'MaintenanceManagement',
+    component: MaintenanceManagement,
+    meta: { requiresAuth: true }
   }
 ];
 
