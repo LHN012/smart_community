@@ -43,4 +43,14 @@ public interface HousesService extends IService<Houses> {
      * @return 是否存在
      */
     boolean isBuildingExists(Integer buildingId);
+
+    /**
+     * 获取房屋列表，包含区域、楼栋和单元信息
+     */
+    List<Houses> listWithAreaAndBuildingAndUnit();
+
+    /**
+     * 房屋充值
+     */
+    boolean recharge(Integer houseId, Integer userId, Double rechargeAmount, String rechargeChannel, String paymentMethod);
 }    

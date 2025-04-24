@@ -4,6 +4,9 @@ import HouseManagement from '../components/HouseManagement.vue';
 import Login from '../components/Login.vue';
 import UserManagement from '../components/UserManagement.vue';
 import UserHouseManagement from '../components/UserHouseManagement.vue'
+import HouseInfoManagement from '../components/HouseInfoManagement.vue'
+import TransactionRecords from '../components/TransactionRecords.vue'
+import NotificationManagement from '../components/NotificationManagement.vue'
 
 const routes = [
   {
@@ -38,6 +41,23 @@ const routes = [
     name: 'UserHouseManagement',
     component: UserHouseManagement,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/house-info',
+    name: 'HouseInfoManagement',
+    component: HouseInfoManagement,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/transaction-records',
+    name: 'TransactionRecords',
+    component: TransactionRecords,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/notifications',
+    name: 'NotificationManagement',
+    component: NotificationManagement
   }
 ];
 

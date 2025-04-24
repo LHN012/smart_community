@@ -16,9 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtTokenUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @Value("${jwt.secret}")
     private String secret;
@@ -59,22 +63,36 @@ public class JwtTokenUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        // 获取用户ID
+        Integer userId = ((CustomUserDetails) userDetails).getUserId();
+        claims.put("userId", userId);
+        
         // 修正角色存储方式（原代码会覆盖角色）
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         claims.put("roles", roles);
-        return doGenerateToken(claims, userDetails.getUsername());
-    }
-
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+        
+        // 添加用户名到claims中
+        claims.put("sub", userDetails.getUsername());
+        
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(subject)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
+    }
+
+    public Integer getUserIdFromToken(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            return claims.get("userId", Integer.class);
+        } catch (Exception e) {
+            logger.error("从token中获取用户ID失败", e);
+            return null;
+        }
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @TableName("notifications")
 public class Notifications {
     @TableId(type = IdType.AUTO)
-    private Integer notificationId;
+    private Integer id;
     
+    private String notificationType;
+    private String title;
     private String content;
-    
-    private String type;
-    
-    private String status;
-    
-    private LocalDateTime createdAt;
+    private Integer senderId;
+    private String receiverType;
+    private Integer receiverId;
+    private LocalDateTime sendTime;
 } 

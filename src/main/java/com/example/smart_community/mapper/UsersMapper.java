@@ -35,4 +35,20 @@ public interface UsersMapper extends BaseMapper<Users> {
      */
     @Select("SELECT * FROM users WHERE role = 1")
     List<Users> selectNormalUsers();
+
+    /**
+     * 根据房屋ID查询用户
+     * @param houseId 房屋ID
+     * @return 用户列表
+     */
+    @Select("SELECT * FROM users WHERE house_id = #{houseId}")
+    List<Users> selectUsersByHouseId(Integer houseId);
+
+    /**
+     * 根据角色查询用户
+     * @param role 角色
+     * @return 用户列表
+     */
+    @Select("SELECT * FROM users WHERE role = #{role}")
+    List<Users> selectUsersByRole(Integer role);
 }

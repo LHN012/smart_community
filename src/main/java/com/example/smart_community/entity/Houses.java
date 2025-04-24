@@ -31,5 +31,10 @@ public class Houses {
     
     private Double size;
     
-    private Double balance;
+    private BigDecimal balance;
+
+    // 关联字段
+    private String areaName;
+    private String buildingName;
+    private String unitName;
 }

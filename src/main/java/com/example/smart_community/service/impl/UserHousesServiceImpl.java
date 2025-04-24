@@ -1,5 +1,6 @@
 package com.example.smart_community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.smart_community.entity.UserHouses;
 import com.example.smart_community.mapper.UserHousesMapper;
@@ -13,5 +14,13 @@ public class UserHousesServiceImpl extends ServiceImpl<UserHousesMapper, UserHou
     @Override
     public List<UserHouses> listWithUserAndHouseInfo() {
         return baseMapper.selectListWithUserAndHouseInfo();
+    }
+
+    @Override
+    public boolean checkUserHouseExists(Integer userId, Integer houseId) {
+        LambdaQueryWrapper<UserHouses> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserHouses::getUserId, userId)
+               .eq(UserHouses::getHouseId, houseId);
+        return count(wrapper) > 0;
     }
 } 

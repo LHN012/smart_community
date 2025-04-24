@@ -6,18 +6,19 @@
     <nav>
       <ul>
         <li :class="{ active: currentPath === '/user-management' }" @click="navigate('/user-management')">
-          <i class="fa-solid fa-users"></i>  用户信息管理
+          <i class="fa-solid fa-users"></i>  用户信息管理模块
         </li>
         <li :class="{ active: currentPath === '/user-house-management' }" @click="navigate('/user-house-management')">
-          <i class="fa-solid fa-price"></i> 用户房屋绑定信息
+          <i class="fa-solid fa-price"></i> 用户房屋绑定模块
         </li>
-        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+        <li :class="{ active: currentPath === '/house-info' }" @click="navigate('/house-info')">
           <i class="fa-solid fa-price"></i> 房屋信息模块
         </li>
+        <!-- transaction-records -->
         <li :class="{ active: currentPath === '' }" @click="navigate('')">
-          <i class="fa-solid fa-price"></i> 缴费管理模块
+          <i class="fa-solid fa-price"></i> 缴费/充值记录
         </li>
-        <li :class="{ active: currentPath === '' }" @click="navigate('')">
+        <li :class="{ active: currentPath === '/notifications' }" @click="navigate('/notifications')">
           <i class="fa-solid fa-notice"></i> 通知管理模块
         </li>
         <li :class="{ active: currentPath === '' }" @click="navigate('')">

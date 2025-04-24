@@ -7,6 +7,8 @@ package com.example.smart_community.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.smart_community.entity.*;
 import com.example.smart_community.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,10 @@ public class HouseController {
     private UnitsService unitsService;
     @Resource
     private HousesService housesService;
+    @Resource
+    private HouseService houseService;
+
+    private static final Logger logger = LoggerFactory.getLogger(HouseController.class);
 
     // 获取区域列表
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
@@ -69,14 +75,18 @@ public class HouseController {
     // 获取楼栋列表
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     @GetMapping("/building/list")
-    public Map<String, Object> listBuildings() {
+    public Map<String, Object> listBuildings(@RequestParam(required = false) Integer areaId) {
         Map<String, Object> result = new HashMap<>();
         try {
-            List<Buildings> buildingList = buildingsService.list();
+            QueryWrapper<Buildings> queryWrapper = new QueryWrapper<>();
+            if (areaId != null) {
+                queryWrapper.eq("area_id", areaId);
+            }
+            List<Buildings> buildingList = buildingsService.list(queryWrapper);
             result.put("code", 200);
             result.put("data", buildingList);
         } catch (Exception e) {
-            e.printStackTrace(); // 打印堆栈跟踪
+            e.printStackTrace();
             result.put("code", 500);
             result.put("msg", "获取楼栋列表失败：" + e.getMessage());
         }
@@ -146,14 +156,18 @@ public class HouseController {
     // 获取房屋列表
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     @GetMapping("/list")
-    public Map<String, Object> listHouses(@RequestParam(required = false) String keyword) {
+    public Map<String, Object> listHouses(@RequestParam(required = false) String keyword,
+                                         @RequestParam(required = false) Integer unitId) {
         Map<String, Object> result = new HashMap<>();
         try {
-            QueryWrapper<Houses> queryWrapper = new QueryWrapper<>();
-            if (keyword != null && !keyword.isEmpty()) {
-                queryWrapper.and(qw -> qw.like("name", keyword).or().like("unit_id", keyword));
+            List<Houses> houseList;
+            if (unitId != null) {
+                houseList = housesService.getHousesByUnitId(unitId);
+            } else if (keyword != null && !keyword.isEmpty()) {
+                houseList = housesService.getHousesByCondition(keyword, null);
+            } else {
+                houseList = housesService.listWithAreaAndBuildingAndUnit();
             }
-            List<Houses> houseList = housesService.list(queryWrapper);
             result.put("code", 200);
             result.put("data", houseList);
         } catch (Exception e) {
@@ -279,6 +293,66 @@ public class HouseController {
         } catch (Exception e) {
             result.put("code", 500);
             result.put("msg", "删除失败：" + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/areas")
+    public Map<String, Object> getAreas() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Map<String, Object>> areas = houseService.getAreas();
+            result.put("code", 200);
+            result.put("data", areas);
+        } catch (Exception e) {
+            logger.error("获取区域列表失败", e);
+            result.put("code", 500);
+            result.put("msg", "获取区域列表失败：" + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/buildings/{areaId}")
+    public Map<String, Object> getBuildingsByArea(@PathVariable Integer areaId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Map<String, Object>> buildings = houseService.getBuildingsByArea(areaId);
+            result.put("code", 200);
+            result.put("data", buildings);
+        } catch (Exception e) {
+            logger.error("获取楼栋列表失败", e);
+            result.put("code", 500);
+            result.put("msg", "获取楼栋列表失败：" + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/units/{buildingId}")
+    public Map<String, Object> getUnitsByBuilding(@PathVariable Integer buildingId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Map<String, Object>> units = houseService.getUnitsByBuilding(buildingId);
+            result.put("code", 200);
+            result.put("data", units);
+        } catch (Exception e) {
+            logger.error("获取单元列表失败", e);
+            result.put("code", 500);
+            result.put("msg", "获取单元列表失败：" + e.getMessage());
+        }
+        return result;
+    }
+
+    @GetMapping("/houses/{unitId}")
+    public Map<String, Object> getHousesByUnit(@PathVariable Integer unitId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Map<String, Object>> houses = houseService.getHousesByUnit(unitId);
+            result.put("code", 200);
+            result.put("data", houses);
+        } catch (Exception e) {
+            logger.error("获取房屋列表失败", e);
+            result.put("code", 500);
+            result.put("msg", "获取房屋列表失败：" + e.getMessage());
         }
         return result;
     }

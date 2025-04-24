@@ -35,8 +35,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         String role = "ROLE_" + (user.getRole() == 3 ? "SUPER_ADMIN" : (user.getRole() == 2 ? "ADMIN" : "USER"));
         logger.info("用户角色: {}", role);
         
-        UserDetails userDetails = new User(user.getUsername(), user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(role)));
+        UserDetails userDetails = new CustomUserDetails(
+            user.getUsername(), 
+            user.getPassword(),
+            Collections.singletonList(new SimpleGrantedAuthority(role)),
+            user.getUserId()
+        );
         logger.info("用户详情创建成功: {}", userDetails);
         return userDetails;
     }
