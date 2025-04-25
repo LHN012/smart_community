@@ -66,43 +66,12 @@
         </div>
         <div class="form-group">
           <label>接收对象类型</label>
-          <select v-model="currentNotification.receiverType" @change="handleReceiverTypeChange">
+          <select v-model="currentNotification.receiverType">
             <option value="">请选择接收对象类型</option>
             <option value="全体业主">全体业主</option>
-            <option value="特定房间业主">特定房间业主</option>
             <option value="物业员工">物业员工</option>
           </select>
         </div>
-        <template v-if="currentNotification.receiverType === '特定房间业主'">
-          <div class="form-group">
-            <label>区域</label>
-            <select v-model="currentNotification.areaId" @change="handleAreaChange">
-              <option value="">请选择区域</option>
-              <option v-for="area in areas" :key="area.id" :value="area.id">{{ area.name }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>楼栋</label>
-            <select v-model="currentNotification.buildingId" @change="handleBuildingChange">
-              <option value="">请选择楼栋</option>
-              <option v-for="building in buildings" :key="building.id" :value="building.id">{{ building.name }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>单元</label>
-            <select v-model="currentNotification.unitId" @change="handleUnitChange">
-              <option value="">请选择单元</option>
-              <option v-for="unit in units" :key="unit.id" :value="unit.id">{{ unit.name }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>房屋</label>
-            <select v-model="currentNotification.roomId">
-              <option value="">请选择房屋</option>
-              <option v-for="house in houses" :key="house.id" :value="house.id">{{ house.name }}</option>
-            </select>
-          </div>
-        </template>
         <div class="dialog-buttons">
           <button class="cancel-btn" @click="closeDialog">取消</button>
           <button class="submit-btn" @click="confirmSubmit">确定</button>
@@ -145,11 +114,7 @@ const currentNotification = ref({
   notificationType: '',
   title: '',
   content: '',
-  receiverType: '',
-  areaId: null,
-  buildingId: null,
-  unitId: null,
-  roomId: null
+  receiverType: ''
 });
 
 const notificationTypeOptions = [
@@ -311,11 +276,7 @@ const showAddDialog = () => {
     notificationType: '',
     title: '',
     content: '',
-    receiverType: '',
-    areaId: null,
-    buildingId: null,
-    unitId: null,
-    roomId: null
+    receiverType: ''
   };
   showDialog.value = true;
 };
@@ -326,11 +287,7 @@ const closeDialog = () => {
     notificationType: '',
     title: '',
     content: '',
-    receiverType: '',
-    areaId: null,
-    buildingId: null,
-    unitId: null,
-    roomId: null
+    receiverType: ''
   };
 };
 
@@ -347,31 +304,30 @@ const handleSubmit = async () => {
   try {
     // 打印要发送的数据
     console.log('准备发送的数据:', currentNotification.value);
-
+    
     // 获取token
     const token = localStorage.getItem('token');
     console.log('当前token:', token);
-
+    
     if (!token) {
       alert('请先登录');
       router.push('/login');
       return;
     }
-
+    
     const response = await api.post('/api/notifications', {
       notificationType: currentNotification.value.notificationType,
       title: currentNotification.value.title,
       content: currentNotification.value.content,
-      receiverType: currentNotification.value.receiverType,
-      roomId: currentNotification.value.roomId
+      receiverType: currentNotification.value.receiverType
     }, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-
+    
     console.log('服务器响应:', response.data);
-
+    
     if (response.data.code === 200) {
       alert('发布成功！');
       await fetchNotifications();
@@ -400,97 +356,8 @@ const handleLogout = () => {
   router.push('/login');
 };
 
-const handleReceiverTypeChange = () => {
-  if (currentNotification.value.receiverType === '特定房间业主') {
-    loadAreas();
-  } else {
-    resetHouseSelection();
-  }
-};
-
-const loadAreas = async () => {
-  try {
-    const response = await api.get('/api/house/areas');
-    if (response.data.code === 200) {
-      areas.value = response.data.data;
-    }
-  } catch (error) {
-    console.error('获取区域列表失败:', error);
-    alert('获取区域列表失败：' + (error.response?.data?.msg || error.message));
-  }
-};
-
-const handleAreaChange = async (areaId) => {
-  if (areaId) {
-    try {
-      const response = await api.get(`/api/house/buildings/${areaId}`);
-      if (response.data.code === 200) {
-        buildings.value = response.data.data;
-        currentNotification.value.buildingId = null;
-        currentNotification.value.unitId = null;
-        currentNotification.value.roomId = null;
-      }
-    } catch (error) {
-      console.error('获取楼栋列表失败:', error);
-      alert('获取楼栋列表失败：' + (error.response?.data?.msg || error.message));
-    }
-  } else {
-    buildings.value = [];
-    units.value = [];
-    houses.value = [];
-  }
-};
-
-const handleBuildingChange = async (buildingId) => {
-  if (buildingId) {
-    try {
-      const response = await api.get(`/api/house/units/${buildingId}`);
-      if (response.data.code === 200) {
-        units.value = response.data.data;
-        currentNotification.value.unitId = null;
-        currentNotification.value.roomId = null;
-      }
-    } catch (error) {
-      console.error('获取单元列表失败:', error);
-      alert('获取单元列表失败：' + (error.response?.data?.msg || error.message));
-    }
-  } else {
-    units.value = [];
-    houses.value = [];
-  }
-};
-
-const handleUnitChange = async (unitId) => {
-  if (unitId) {
-    try {
-      const response = await api.get(`/api/house/houses/${unitId}`);
-      if (response.data.code === 200) {
-        houses.value = response.data.data;
-        currentNotification.value.roomId = null;
-      }
-    } catch (error) {
-      console.error('获取房屋列表失败:', error);
-      alert('获取房屋列表失败：' + (error.response?.data?.msg || error.message));
-    }
-  } else {
-    houses.value = [];
-  }
-};
-
-const resetHouseSelection = () => {
-  currentNotification.value.areaId = null;
-  currentNotification.value.buildingId = null;
-  currentNotification.value.unitId = null;
-  currentNotification.value.roomId = null;
-  areas.value = [];
-  buildings.value = [];
-  units.value = [];
-  houses.value = [];
-};
-
 onMounted(() => {
   fetchNotifications();
-  loadAreas();
 });
 </script>
 

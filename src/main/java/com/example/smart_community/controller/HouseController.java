@@ -247,13 +247,12 @@ public class HouseController {
                 result.put("msg", "单元不存在");
                 return result;
             }
-            // 更新字段
+            // 更新字段（不更新余额）
             dbHouse.setAreaId(house.getAreaId());
             dbHouse.setBuildingId(house.getBuildingId());
             dbHouse.setUnitId(house.getUnitId());
             dbHouse.setName(house.getName());
             dbHouse.setSize(house.getSize());
-            dbHouse.setBalance(house.getBalance());
             dbHouse.setPrice(house.getPrice());
             boolean success = housesService.updateById(dbHouse);
             if (success) {

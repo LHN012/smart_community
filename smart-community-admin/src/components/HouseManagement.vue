@@ -30,7 +30,7 @@
             <th>房屋名称</th>
             <th>面积(㎡)</th>
             <th>余额</th>
-            <th>单价</th>
+            <th>单价(元/㎡)</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -133,10 +133,6 @@
         <div class="form-group">
           <label>面积(㎡)</label>
           <input v-model="currentHouse.size" type="number" />
-        </div>
-        <div class="form-group">
-          <label>余额</label>
-          <input v-model="currentHouse.balance" type="number" />
         </div>
         <div class="form-group">
           <label>单价</label>
@@ -394,7 +390,7 @@ const showAddHouseDialog = () => {
     buildingId: '',
     unitId: '',
     size: 0,
-    balance: 0,
+    balance: 0,  // 默认余额为0
     price: 0
   };
   showHouseDialog.value = true;
@@ -423,7 +419,7 @@ const closeHouseDialog = () => {
 const handleHouseSubmit = async () => {
   if (!currentHouse.value.areaId || !currentHouse.value.buildingId || 
       !currentHouse.value.unitId || !currentHouse.value.name || 
-      !currentHouse.value.size || !currentHouse.value.balance || !currentHouse.value.price) {
+      !currentHouse.value.size || !currentHouse.value.price) {
     alert('请填写完整信息！');
     return;
   }
@@ -439,6 +435,8 @@ const handleHouseSubmit = async () => {
         alert(response.data.msg || '更新失败');
       }
     } else {
+      // 确保新建时余额为0
+      currentHouse.value.balance = 0;
       const response = await api.post('/api/house/create', currentHouse.value);
       if (response.data.code === 200) {
         alert('创建成功！');

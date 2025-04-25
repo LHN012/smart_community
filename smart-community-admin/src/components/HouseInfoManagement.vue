@@ -43,6 +43,7 @@
             <td>
               <button class="recharge-btn" @click="openRechargeDialog(house)">充值</button>
               <button class="bind-btn" @click="openBindDialog(house)">绑定用户</button>
+              <button class="notify-btn" @click="openNotifyDialog(house)">发送通知</button>
             </td>
           </tr>
         </tbody>
@@ -103,6 +104,36 @@
         </div>
       </div>
     </div>
+
+    <!-- 发送通知对话框 -->
+    <div v-if="showNotifyDialog" class="dialog-overlay">
+      <div class="dialog">
+        <h3>发送通知</h3>
+        <div class="form-group">
+          <label>通知类型</label>
+          <select v-model="notificationType">
+            <option value="公告">公告</option>
+            <option value="报修通知">报修通知</option>
+            <option value="缴费通知">缴费通知</option>
+            <option value="活动通知">活动通知</option>
+            <option value="紧急通知">紧急通知</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>标题</label>
+          <input v-model="notificationTitle" placeholder="请输入通知标题" />
+        </div>
+        <div class="form-group">
+          <label>内容</label>
+          <textarea v-model="notificationContent" placeholder="请输入通知内容" rows="4"></textarea>
+        </div>
+        <div class="dialog-buttons">
+          <button class="cancel-btn" @click="closeNotifyDialog">取消</button>
+          <button class="submit-btn" @click="handleSendNotification">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -117,12 +148,16 @@ const users = ref([]);
 const searchKeyword = ref('');
 const showRechargeDialog = ref(false);
 const showBindDialog = ref(false);
+const showNotifyDialog = ref(false);
 const currentHouse = ref(null);
 const rechargeAmount = ref('');
 const rechargeChannel = ref('线下');
 const paymentMethod = ref('微信');
 const selectedUserId = ref('');
 const relationType = ref('户主');
+const notificationType = ref('公告');
+const notificationTitle = ref('');
+const notificationContent = ref('');
 
 const filteredHouses = computed(() => {
   if (!searchKeyword.value) return houses.value;
@@ -184,6 +219,22 @@ const closeBindDialog = () => {
   showBindDialog.value = false;
   currentHouse.value = null;
   selectedUserId.value = '';
+};
+
+const openNotifyDialog = (house) => {
+  currentHouse.value = house;
+  notificationType.value = '公告';
+  notificationTitle.value = '';
+  notificationContent.value = '';
+  showNotifyDialog.value = true;
+};
+
+const closeNotifyDialog = () => {
+  showNotifyDialog.value = false;
+  currentHouse.value = null;
+  notificationType.value = '公告';
+  notificationTitle.value = '';
+  notificationContent.value = '';
 };
 
 const handleRecharge = async () => {
@@ -259,6 +310,63 @@ const handleBind = async () => {
     } else {
       alert('绑定失败：' + errorMsg);
     }
+  }
+};
+
+const handleSendNotification = async () => {
+  // 验证必填字段
+  if (!notificationType.value) {
+    alert('请选择通知类型！');
+    return;
+  }
+  if (!notificationTitle.value.trim()) {
+    alert('请输入通知标题！');
+    return;
+  }
+  if (!notificationContent.value.trim()) {
+    alert('请输入通知内容！');
+    return;
+  }
+  if (!currentHouse.value?.houseId) {
+    alert('房屋信息不完整！');
+    return;
+  }
+
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user?.userId) {
+      alert('用户信息不完整，请重新登录！');
+      return;
+    }
+
+    const requestData = {
+      notificationType: notificationType.value,
+      title: notificationTitle.value.trim(),
+      content: notificationContent.value.trim(),
+      senderId: user.userId,
+      receiverType: '特定房间业主',
+      roomId: currentHouse.value.houseId
+    };
+    
+    console.log('发送通知请求数据：', requestData);
+    
+    const response = await api.post('/api/notifications', requestData);
+    console.log('发送通知响应：', response);
+    
+    if (response.data.code === 200) {
+      alert('通知发送成功！');
+      closeNotifyDialog();
+    } else {
+      alert('通知发送失败：' + response.data.msg);
+    }
+  } catch (error) {
+    console.error('发送通知失败:', error);
+    console.error('错误详情:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    alert('通知发送失败：' + (error.response?.data?.msg || error.message));
   }
 };
 
@@ -380,6 +488,22 @@ th {
   background-color: #2980b9;
 }
 
+.notify-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: #9b59b6;
+  color: white;
+  margin-left: 8px;
+}
+
+.notify-btn:hover {
+  background-color: #8e44ad;
+}
+
 .dialog-overlay {
   position: fixed;
   top: 0;
@@ -484,5 +608,14 @@ th {
   border: 1px solid #ddd;
   border-radius: 4px;
   color: #666;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: vertical;
 }
 </style> 

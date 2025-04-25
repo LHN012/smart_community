@@ -3,6 +3,7 @@ package com.example.smart_community.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -34,7 +35,12 @@ public class Houses {
     private BigDecimal balance;
 
     // 关联字段
+    @TableField(exist = false)
     private String areaName;
+    
+    @TableField(exist = false)
     private String buildingName;
+    
+    @TableField(exist = false)
     private String unitName;
 }

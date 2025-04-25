@@ -41,7 +41,9 @@ public interface UsersMapper extends BaseMapper<Users> {
      * @param houseId 房屋ID
      * @return 用户列表
      */
-    @Select("SELECT * FROM users WHERE house_id = #{houseId}")
+    @Select("SELECT u.* FROM users u " +
+            "JOIN userhouses uh ON u.user_id = uh.user_id " +
+            "WHERE uh.house_id = #{houseId}")
     List<Users> selectUsersByHouseId(Integer houseId);
 
     /**

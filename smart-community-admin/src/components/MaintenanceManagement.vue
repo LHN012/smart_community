@@ -175,7 +175,23 @@ const fetchRequests = async () => {
     
     if (response.data.code === 200) {
       requests.value = response.data.data.requests;
-      usersInfo.value = response.data.data.usersInfo;
+      // 确保用户信息存在
+      if (response.data.data.usersInfo) {
+        usersInfo.value = response.data.data.usersInfo;
+      } else {
+        // 如果没有用户信息，尝试获取
+        const usersResponse = await api.get('/api/admin/normal-users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (usersResponse.data.code === 200) {
+          const usersList = usersResponse.data.data;
+          const usersMap = {};
+          usersList.forEach(user => {
+            usersMap[user.userId] = user.username || user.realName || '未知用户';
+          });
+          usersInfo.value = usersMap;
+        }
+      }
     }
   } catch (error) {
     console.error('获取报修列表失败:', error);
