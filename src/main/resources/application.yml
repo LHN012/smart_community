@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/smart_hotel?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: liuhaonan2001
+    password: jidexiugai
   sql:
     init:
       mode: always
@@ -48,4 +48,4 @@ file:
 
 wx:
   appid: wx16f92eeeb5bedd54
-  secret: e11c14864cda8a26b133dc9ffe0ebb24
+  secret: jidetianjia
