@@ -1,0 +1,24 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <view class="user-info">
+    <image class="avatar" src="{{userInfo.avatar || 'http://localhost:8080/images/default-avatar.svg'}}" mode="aspectFill"></image>
+    <view class="info">
+      <text class="nickname">{{userInfo.realName || '未登录'}}</text>
+      <text class="phone">{{userInfo.phoneNumber || '点击登录'}}</text>
+    </view>
+  </view>
+
+  <view class="wx-binding">
+    <view class="binding-status">
+      <text>微信绑定状态：</text>
+      <text class="{{isWxBound ? 'bound' : 'unbound'}}">{{isWxBound ? '已绑定' : '未绑定'}}</text>
+    </view>
+    <button wx:if="{{!isWxBound}}" class="bind-btn" bindtap="bindWxAccount">
+      <image class="wechat-icon" src="http://localhost:8080/images/wechat.svg" mode="aspectFit"></image>
+      绑定微信账号
+    </button>
+    <view wx:else class="bound-info">
+      <text>已绑定微信：{{wxUserInfo.nickname}}</text>
+    </view>
+  </view>
+</view>

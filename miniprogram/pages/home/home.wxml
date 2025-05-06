@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="header">
+    <view class="welcome">欢迎使用智慧社区</view>
+  </view>
+  
+  <view class="grid-container">
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/notice/notice">
+      <image src="/images/notice.svg" mode="aspectFit"></image>
+      <text>社区公告</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/repair/repair">
+      <image src="/images/repair.svg" mode="aspectFit"></image>
+      <text>故障报修</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/payment/payment">
+      <image src="/images/payment.svg" mode="aspectFit"></image>
+      <text>费用缴纳</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/usage/usage">
+      <image src="/images/usage.svg" mode="aspectFit"></image>
+      <text>用量查询</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/recharge/recharge">
+      <image src="/images/recharge.svg" mode="aspectFit"></image>
+      <text>在线充值</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/profile/profile">
+      <image src="/images/profile.svg" mode="aspectFit"></image>
+      <text>个人信息</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/complaint/complaint">
+      <image src="/images/complaint.svg" mode="aspectFit"></image>
+      <text>投诉建议</text>
+    </view>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/activity/activity">
+      <image src="/images/activity.svg" mode="aspectFit"></image>
+      <text>社区活动</text>
+    </view>
+  </view>
+</view> 

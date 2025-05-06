@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/smart_hotel?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: liuhaonan2001
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      continue-on-error: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mvc:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+
+jwt:
+  secret: c21hcnRfY29tbXVuaXR5X2p3dF9zZWNyZXRfa2V5XzIwMjRfc2VjdXJlX2FuZF9sb25nX2Vub3VnaF9mb3JfaHM1MTI=
+  expiration: 86400
+
+logging:
+  level:
+    root: INFO
+    com.example.smart_community: DEBUG
+
+file:
+  upload:
+    path: D:/Work/Smart_Hotel/smart_community/src/main/resources/images/
+    url-prefix: /images/
+
+wx:
+  appid: wx16f92eeeb5bedd54
+  secret: e11c14864cda8a26b133dc9ffe0ebb24

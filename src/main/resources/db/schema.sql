@@ -49,4 +49,25 @@ CREATE TABLE IF NOT EXISTS houses (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='房屋表';
 
 -- 删除用户档案表
-DROP TABLE IF EXISTS user_profile; 
+DROP TABLE IF EXISTS user_profile;
+
+-- 微信用户表
+CREATE TABLE IF NOT EXISTS wx_user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+    openid VARCHAR(64) NOT NULL COMMENT '微信用户唯一标识',
+    unionid VARCHAR(64) COMMENT '微信开放平台唯一标识',
+    session_key VARCHAR(64) COMMENT '会话密钥',
+    nickname VARCHAR(64) COMMENT '微信昵称',
+    avatar_url VARCHAR(255) COMMENT '微信头像URL',
+    gender TINYINT COMMENT '性别：0-未知，1-男，2-女',
+    country VARCHAR(64) COMMENT '国家',
+    province VARCHAR(64) COMMENT '省份',
+    city VARCHAR(64) COMMENT '城市',
+    language VARCHAR(32) COMMENT '语言',
+    phone VARCHAR(20) COMMENT '手机号',
+    user_id BIGINT COMMENT '关联的用户ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE KEY uk_openid (openid),
+    KEY idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='微信用户表'; 

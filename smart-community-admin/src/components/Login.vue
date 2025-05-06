@@ -50,6 +50,7 @@ const handleLogin = async () => {
       const { token, user } = response.data.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      window.dispatchEvent(new Event('storage'));
       if (user.role === 2) {
         router.push('/user-management');
       } else {

@@ -227,6 +227,7 @@ const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    window.dispatchEvent(new Event('storage'));
     router.push('/login');
   }
 };

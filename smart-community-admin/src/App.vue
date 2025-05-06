@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import Sidebar1 from './components/SuperAdmin_Sidebar.vue';
 import Sidebar2 from './components/Admin_Sidebar.vue';
@@ -9,7 +9,8 @@ const showSidebar = computed(() => route.path !== '/login');
 // 定义 userRole 为响应式变量
 const userRole = ref(null);
 
-onMounted(() => {
+// 更新用户角色的方法
+const updateUserRole = () => {
   try {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     userRole.value = user.role;
@@ -17,6 +18,17 @@ onMounted(() => {
     console.error('解析用户信息出错:', error);
     userRole.value = null;
   }
+};
+
+onMounted(() => {
+  updateUserRole();
+  // 监听localStorage的变化
+  window.addEventListener('storage', updateUserRole);
+});
+
+// 组件卸载时移除事件监听
+onUnmounted(() => {
+  window.removeEventListener('storage', updateUserRole);
 });
 
 </script>
