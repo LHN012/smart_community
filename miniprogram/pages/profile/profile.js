@@ -9,7 +9,8 @@ Page({
   data: {
     userInfo: null,
     isWxBound: false,
-    wxUserInfo: null
+    wxUserInfo: null,
+    loginType: '' // 'normal' 或 'wx'
   },
 
   /**
@@ -21,46 +22,130 @@ Page({
   },
 
   onShow() {
-    // 每次显示页面时重新检查绑定状态
+    // 每次显示页面时重新加载用户信息
+    this.loadUserInfo();
     this.checkWxBinding();
+  },
+
+  // 检查token是否过期
+  isTokenExpired(token) {
+    if (!token) return true;
+    
+    try {
+      // 检查是否是JWT token（包含两个点）
+      if (token.split('.').length === 3) {
+        // 移除Bearer前缀
+        const tokenWithoutBearer = token.replace('Bearer ', '');
+        
+        // 解析JWT token
+        const base64Url = tokenWithoutBearer.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const payload = JSON.parse(jsonPayload);
+        const expirationTime = payload.exp * 1000; // 转换为毫秒
+        const currentTime = Date.now();
+
+        console.log('JWT Token解析结果:', payload);
+        console.log('Token过期时间:', new Date(expirationTime));
+        console.log('当前时间:', new Date(currentTime));
+        console.log('是否过期:', currentTime >= expirationTime);
+
+        return currentTime >= expirationTime;
+      } else {
+        // 非JWT token，检查是否存在于会话中
+        console.log('非JWT token，检查会话状态');
+        return false; // 假设非JWT token不会过期
+      }
+    } catch (error) {
+      console.error('解析token失败:', error);
+      return false; // 如果解析失败，认为token有效
+    }
   },
 
   // 加载用户信息
   loadUserInfo() {
     const token = wx.getStorageSync('token');
+    const userInfo = wx.getStorageSync('userInfo');
     console.log('从Storage获取的token:', token);
+    console.log('从Storage获取的userInfo:', userInfo);
     
-    if (!token) {
+    if (!token || !userInfo) {
+      console.log('未找到登录信息，跳转到登录页');
       wx.showToast({
         title: '请先登录',
         icon: 'none'
       });
-      wx.navigateTo({
+      wx.redirectTo({
         url: '/pages/login/login'
       });
       return;
     }
 
-    const authHeader = `Bearer ${token}`;
+    // 检查token是否过期
+    if (this.isTokenExpired(token)) {
+      console.log('Token已过期，跳转到登录页');
+      wx.showToast({
+        title: '登录已过期，请重新登录',
+        icon: 'none'
+      });
+      // 清除登录信息
+      wx.removeStorageSync('token');
+      wx.removeStorageSync('userInfo');
+      // 跳转到登录页
+      setTimeout(() => {
+        wx.redirectTo({
+          url: '/pages/login/login'
+        });
+      }, 1500);
+      return;
+    }
+
+    // 先设置本地存储的用户信息
+    this.setData({
+      userInfo: userInfo
+    });
+
+    // 确保token格式正确
+    const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     console.log('发送的Authorization header:', authHeader);
 
+    // 判断登录类型
+    const isWxLogin = userInfo.openid != null;
+    this.setData({ loginType: isWxLogin ? 'wx' : 'normal' });
+
+    // 根据登录类型选择不同的API
+    const apiUrl = isWxLogin ? 
+      'http://localhost:8080/api/wx/user/info' : 
+      'http://localhost:8080/api/user/info';
+
+    // 准备请求参数
+    const requestData = isWxLogin ? { openid: userInfo.openid } : {};
+
+    // 发送请求
     wx.request({
-      url: 'http://localhost:8080/api/user/info',
+      url: apiUrl,
       method: 'GET',
       header: {
         'Authorization': authHeader,
-        'content-type': 'application/json',
-        'Accept': 'application/json'
+        'content-type': 'application/json'
       },
-      withCredentials: true,
+      data: requestData,
       success: (res) => {
         console.log('获取用户信息响应:', res);
-        if (res.statusCode === 200) {
+        if (res.statusCode === 200 && res.data) {
+          // 更新本地存储和页面数据
+          const updatedUserInfo = { ...userInfo, ...res.data };
+          wx.setStorageSync('userInfo', updatedUserInfo);
           this.setData({
-            userInfo: res.data
+            userInfo: updatedUserInfo
           });
         } else if (res.statusCode === 401 || res.statusCode === 403) {
           console.log('Token验证失败，状态码:', res.statusCode);
+          console.log('Token内容:', token);
+          console.log('响应头:', res.header);
           
           // 检查token是否过期
           if (res.statusCode === 401) {
@@ -81,7 +166,7 @@ Page({
           
           // 跳转到登录页
           setTimeout(() => {
-            wx.navigateTo({
+            wx.redirectTo({
               url: '/pages/login/login'
             });
           }, 1500);
@@ -125,12 +210,15 @@ Page({
       return;
     }
 
+    // 确保token格式正确
+    const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
     // 否则检查是否已绑定
     wx.request({
       url: `http://localhost:8080/api/wx/user/info?userId=${userInfo.userId}`,
       method: 'GET',
       header: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': authHeader,
         'content-type': 'application/json'
       },
       success: (res) => {
@@ -170,11 +258,14 @@ Page({
         title: '请先登录',
         icon: 'none'
       });
-      wx.navigateTo({
+      wx.redirectTo({
         url: '/pages/login/login'
       });
       return;
     }
+
+    // 确保token格式正确
+    const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
     wx.login({
       success: (res) => {
@@ -184,7 +275,7 @@ Page({
             url: 'http://localhost:8080/api/wx/bind',
             method: 'POST',
             header: {
-              'Authorization': `Bearer ${token}`,
+              'Authorization': authHeader,
               'content-type': 'application/json'
             },
             data: {

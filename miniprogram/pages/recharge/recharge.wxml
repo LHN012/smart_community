@@ -1,2 +1,52 @@
 <!--pages/recharge/recharge.wxml-->
-<text>pages/recharge/recharge.wxml</text>
+<view class="container">
+  <!-- 房屋选择 -->
+  <view class="section">
+    <view class="section-title">选择房屋</view>
+    <picker bindchange="onHouseChange" value="{{index}}" range="{{houses}}" range-key="name">
+      <view class="picker">
+        <text>{{currentHouse ? currentHouse.name : '请选择房屋'}}</text>
+        <text class="arrow">></text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 当前余额 -->
+  <view class="section">
+    <view class="section-title">当前余额</view>
+    <view class="balance">¥ {{balance}}</view>
+  </view>
+
+  <!-- 充值金额输入 -->
+  <view class="section">
+    <view class="section-title">充值金额</view>
+    <view class="input-group">
+      <text class="currency">¥</text>
+      <input type="digit" value="{{rechargeAmount}}" bindinput="onAmountInput" placeholder="请输入充值金额"/>
+    </view>
+  </view>
+
+  <!-- 充值按钮 -->
+  <view class="section">
+    <button class="recharge-btn" bindtap="showPayment">立即充值</button>
+  </view>
+
+  <!-- 支付方式选择弹窗 -->
+  <view class="payment-modal" wx:if="{{showPaymentOptions}}">
+    <view class="modal-mask" bindtap="hidePayment"></view>
+    <view class="modal-content">
+      <view class="modal-title">选择支付方式</view>
+      <view class="payment-options">
+        <view class="payment-option" bindtap="choosePayment" data-method="微信">
+          <image src="/images/wechat-pay.png" mode="aspectFit"></image>
+          <text>微信支付</text>
+        </view>
+        <view class="payment-option" bindtap="choosePayment" data-method="支付宝">
+          <image src="/images/alipay.png" mode="aspectFit"></image>
+          <text>支付宝支付</text>
+        </view>
+      </view>
+      <view class="modal-close" bindtap="hidePayment">取消</view>
+    </view>
+  </view>
+</view>

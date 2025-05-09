@@ -13,4 +13,7 @@ public class WxUserInfo {
     private String city;
     private String language;
     private Long userId;
+    private String realName;
+    private String phone;
+    private String email;
 } 

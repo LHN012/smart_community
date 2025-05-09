@@ -2,7 +2,9 @@ package com.example.wx_smart_community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.wx_smart_community.entity.WxUser;
+import com.example.wx_smart_community.entity.User;
 import com.example.wx_smart_community.mapper.WxUserMapper;
+import com.example.wx_smart_community.mapper.UserMapper;
 import com.example.wx_smart_community.service.WxUserService;
 import com.example.wx_smart_community.config.WxProperties;
 import com.example.wx_smart_community.model.WxLoginResponse;
@@ -23,6 +25,9 @@ public class WxUserServiceImpl implements WxUserService {
 
     @Autowired
     private WxUserMapper wxUserMapper;
+    
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -92,11 +97,18 @@ public class WxUserServiceImpl implements WxUserService {
         if (openid != null) {
             wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("openid", openid));
         } else if (userId != null) {
-            wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("user_id", userId));
+            wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("user_id", Long.parseLong(userId)));
         }
         
         if (wxUser == null) {
+            log.warn("未找到微信用户信息");
             return null;
+        }
+        
+        // 获取关联的用户信息
+        User user = null;
+        if (wxUser.getUserId() != null) {
+            user = userMapper.selectById(wxUser.getUserId().intValue());
         }
         
         WxUserInfo userInfo = new WxUserInfo();
@@ -109,6 +121,13 @@ public class WxUserServiceImpl implements WxUserService {
         userInfo.setCity(wxUser.getCity());
         userInfo.setLanguage(wxUser.getLanguage());
         userInfo.setUserId(wxUser.getUserId());
+        
+        // 如果有关联的用户信息，补充用户信息
+        if (user != null) {
+            userInfo.setRealName(user.getRealName());
+            userInfo.setPhone(user.getPhoneNumber());
+            userInfo.setEmail(user.getEmail());
+        }
         
         return userInfo;
     }

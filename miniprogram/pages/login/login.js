@@ -2,7 +2,8 @@ Page({
   data: {
     username: '',
     password: '',
-    loading: false
+    loading: false,
+    wxLoginCode: '' // 存储微信登录code
   },
 
   onUsernameInput(e) {
@@ -47,12 +48,36 @@ Page({
         password: this.data.password
       },
       success: (res) => {
+        console.log('登录响应:', res);
         if (res.statusCode === 200) {
           const { token, user } = res.data;
+          if (!token || !user) {
+            wx.showToast({
+              title: '登录数据不完整',
+              icon: 'none'
+            });
+            return;
+          }
+          
+          // 确保token格式正确
+          const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+          console.log('保存的token:', formattedToken);
+          console.log('保存的用户信息:', user);
+          
           // 保存token和用户信息
-          wx.setStorageSync('token', token);
+          wx.setStorageSync('token', formattedToken);
           wx.setStorageSync('userInfo', user);
-          this.navigateToHome();
+          
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success',
+            duration: 1500,
+            complete: () => {
+              setTimeout(() => {
+                this.navigateToHome();
+              }, 1500);
+            }
+          });
         } else {
           wx.showToast({
             title: res.data || '登录失败',
@@ -76,6 +101,27 @@ Page({
   handleWechatLogin() {
     this.setData({ loading: true });
     
+    // 先获取用户信息
+    wx.getUserProfile({
+      desc: '用于完善用户资料',
+      success: (profileRes) => {
+        console.log('获取用户信息成功:', profileRes);
+        // 获取到用户信息后，再进行微信登录
+        this.wxLogin(profileRes.userInfo);
+      },
+      fail: (err) => {
+        console.error('获取用户信息失败:', err);
+        wx.showToast({
+          title: '需要授权才能登录',
+          icon: 'none'
+        });
+        this.setData({ loading: false });
+      }
+    });
+  },
+
+  // 执行微信登录
+  wxLogin(userInfo) {
     wx.login({
       success: (res) => {
         if (res.code) {
@@ -88,16 +134,32 @@ Page({
               'content-type': 'application/json'
             },
             data: {
-              code: res.code
+              code: res.code,
+              userInfo: userInfo // 添加用户信息
             },
             success: (response) => {
               console.log('微信登录响应:', response);
               if (response.statusCode === 200 && response.data) {
                 const { token, user } = response.data;
                 if (token && user) {
+                  // 确保token格式正确
+                  const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+                  
+                  // 合并用户信息，确保包含所有必要字段
+                  const updatedUser = {
+                    ...user,
+                    nickname: userInfo.nickName,
+                    avatarUrl: userInfo.avatarUrl,
+                    openid: user.openid,
+                    userId: user.userId
+                  };
+                  
+                  console.log('保存的用户信息:', updatedUser);
+                  
                   // 保存token和用户信息
-                  wx.setStorageSync('token', token);
-                  wx.setStorageSync('userInfo', user);
+                  wx.setStorageSync('token', formattedToken);
+                  wx.setStorageSync('userInfo', updatedUser);
+                  
                   wx.showToast({
                     title: '登录成功',
                     icon: 'success',
