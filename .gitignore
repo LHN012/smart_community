@@ -65,3 +65,4 @@ __pycache__/
 *.zip
 *.tar.gz
 *.7z
+src/main/resources/application.yml
