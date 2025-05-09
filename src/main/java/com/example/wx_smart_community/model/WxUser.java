@@ -1,4 +1,4 @@
-package com.example.smartcommunity.model;
+package com.example.wx_smart_community.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

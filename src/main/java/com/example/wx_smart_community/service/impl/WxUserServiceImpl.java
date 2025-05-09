@@ -1,6 +1,7 @@
 package com.example.wx_smart_community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.wx_smart_community.entity.WxUser;
 import com.example.wx_smart_community.entity.User;
 import com.example.wx_smart_community.mapper.WxUserMapper;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class WxUserServiceImpl implements WxUserService {
+public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> implements WxUserService {
 
     @Autowired
     private WxUserMapper wxUserMapper;
@@ -59,21 +60,51 @@ public class WxUserServiceImpl implements WxUserService {
             String responseBody = responseEntity.getBody();
             log.info("微信接口返回原始数据：{}", responseBody);
             
+            if (responseBody == null) {
+                throw new RuntimeException("微信接口返回数据为空");
+            }
+            
             Map<String, Object> response = objectMapper.readValue(responseBody, Map.class);
             log.info("微信接口返回解析后数据：{}", response);
             
-            if (response == null || response.get("openid") == null) {
-                String errorMsg = response != null ? (String) response.get("errmsg") : "未知错误";
-                log.error("获取openid失败：{}", errorMsg);
-                throw new RuntimeException("获取openid失败：" + errorMsg);
+            if (response == null) {
+                throw new RuntimeException("解析微信接口返回数据失败");
+            }
+            
+            if (response.get("errcode") != null) {
+                String errorMsg = String.format("微信接口返回错误：%s - %s", 
+                    response.get("errcode"), 
+                    response.get("errmsg"));
+                log.error(errorMsg);
+                throw new RuntimeException(errorMsg);
             }
             
             String openid = (String) response.get("openid");
-            log.info("成功获取openid: {}", openid);
+            String sessionKey = (String) response.get("session_key");
+            
+            if (openid == null || sessionKey == null) {
+                throw new RuntimeException("获取openid或session_key失败");
+            }
+            
+            log.info("成功获取openid: {}, sessionKey: {}", openid, sessionKey);
             
             // 生成token
             String token = jwtUtil.generateToken(openid);
             log.info("生成token成功");
+            
+            // 获取或创建用户信息
+            WxUser wxUser = findByOpenid(openid);
+            if (wxUser == null) {
+                wxUser = new WxUser();
+                wxUser.setOpenid(openid);
+                wxUser.setSessionKey(sessionKey);
+                save(wxUser);
+                log.info("创建新微信用户成功");
+            } else {
+                wxUser.setSessionKey(sessionKey);
+                updateById(wxUser);
+                log.info("更新微信用户sessionKey成功");
+            }
             
             // 获取用户信息
             WxUserInfo userInfo = getUserInfo(openid, null);
@@ -97,7 +128,7 @@ public class WxUserServiceImpl implements WxUserService {
         if (openid != null) {
             wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("openid", openid));
         } else if (userId != null) {
-            wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("user_id", Long.parseLong(userId)));
+            wxUser = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("user_id", Integer.parseInt(userId)));
         }
         
         if (wxUser == null) {
@@ -108,18 +139,12 @@ public class WxUserServiceImpl implements WxUserService {
         // 获取关联的用户信息
         User user = null;
         if (wxUser.getUserId() != null) {
-            user = userMapper.selectById(wxUser.getUserId().intValue());
+            user = userMapper.selectById(wxUser.getUserId());
         }
         
         WxUserInfo userInfo = new WxUserInfo();
         userInfo.setOpenid(wxUser.getOpenid());
         userInfo.setNickname(wxUser.getNickname());
-        userInfo.setAvatarUrl(wxUser.getAvatarUrl());
-        userInfo.setGender(String.valueOf(wxUser.getGender()));
-        userInfo.setCountry(wxUser.getCountry());
-        userInfo.setProvince(wxUser.getProvince());
-        userInfo.setCity(wxUser.getCity());
-        userInfo.setLanguage(wxUser.getLanguage());
         userInfo.setUserId(wxUser.getUserId());
         
         // 如果有关联的用户信息，补充用户信息
@@ -160,24 +185,55 @@ public class WxUserServiceImpl implements WxUserService {
         // 保存绑定关系到数据库
         WxUser wxUser = new WxUser();
         wxUser.setOpenid(openid);
-        wxUser.setUserId(Long.parseLong(userId));
+        wxUser.setUserId(Integer.parseInt(userId));
         wxUserMapper.insert(wxUser);
         
         return getUserInfo(openid, null);
     }
 
     @Override
-    public WxUser getUserByOpenid(String openid) {
-        return wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("openid", openid));
-    }
-
-    @Override
-    public WxUser getUserByUserId(Long userId) {
-        return wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("user_id", userId));
-    }
-
-    @Override
     public void updateUserInfo(WxUser wxUser) {
-        wxUserMapper.updateById(wxUser);
+        log.info("更新微信用户信息：{}", wxUser);
+        if (wxUser.getId() == null && wxUser.getOpenid() == null) {
+            throw new RuntimeException("id和openid不能同时为空");
+        }
+        
+        WxUser existingUser = null;
+        if (wxUser.getId() != null) {
+            existingUser = getById(wxUser.getId());
+        } else {
+            existingUser = findByOpenid(wxUser.getOpenid());
+        }
+        
+        if (existingUser == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        
+        // 更新用户信息
+        updateById(wxUser);
+    }
+
+    @Override
+    public WxUser findByOpenid(String openid) {
+        QueryWrapper<WxUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("openid", openid);
+        return getOne(queryWrapper);
+    }
+
+    @Override
+    public boolean saveOrUpdate(WxUser wxUser) {
+        return super.saveOrUpdate(wxUser);
+    }
+
+    @Override
+    public WxUser findByUserId(Integer userId) {
+        QueryWrapper<WxUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        return getOne(queryWrapper);
+    }
+
+    @Override
+    public boolean updateWxUser(WxUser wxUser) {
+        return updateById(wxUser);
     }
 } 

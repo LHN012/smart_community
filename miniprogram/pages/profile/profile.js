@@ -201,19 +201,10 @@ Page({
       return;
     }
 
-    // 如果已经有openid，说明已经绑定过微信
-    if (userInfo.openid) {
-      this.setData({
-        isWxBound: true,
-        wxUserInfo: userInfo
-      });
-      return;
-    }
-
     // 确保token格式正确
     const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
-    // 否则检查是否已绑定
+    // 检查是否已绑定
     wx.request({
       url: `http://localhost:8080/api/wx/user/info?userId=${userInfo.userId}`,
       method: 'GET',

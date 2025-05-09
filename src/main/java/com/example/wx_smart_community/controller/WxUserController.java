@@ -26,10 +26,10 @@ public class WxUserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> params) {
+    public ResponseEntity<?> login(@RequestBody Map<String, Object> params) {
         try {
             log.info("收到微信登录请求，参数：{}", params);
-            String code = params.get("code");
+            String code = (String) params.get("code");
             if (code == null || code.trim().isEmpty()) {
                 log.error("微信登录失败：code为空");
                 return ResponseEntity.badRequest().body("登录凭证不能为空");
