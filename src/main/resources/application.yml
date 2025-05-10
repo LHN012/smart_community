@@ -48,4 +48,9 @@ file:
 
 wx:
   appid: wx16f92eeeb5bedd54
-  secret: e11c14864cda8a26b133dc9ffe0ebb24
+  secret: your_app_secret
+  pay:
+    appid: wx16f92eeeb5bedd54
+    mchid: your_mch_id
+    key: your_mch_key
+    notify-url: http://your_domain/api/recharge/notify
