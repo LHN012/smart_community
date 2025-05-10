@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="header">
+    <text class="title">故障报修</text>
+    <button class="submit-btn" bindtap="navigateToSubmit">我要报修</button>
+  </view>
+
+  <view class="request-list">
+    <block wx:if="{{requests.length > 0}}">
+      <view class="request-item" wx:for="{{requests}}" wx:key="id">
+        <view class="request-header">
+          <text class="request-status {{item.status === '待处理' ? 'pending' : item.status === '处理中' ? 'processing' : 'completed'}}">
+            {{item.status}}
+          </text>
+        </view>
+        <view class="request-content">
+          <text class="request-desc">{{item.description}}</text>
+          <text class="request-location">位置：{{item.location}}</text>
+          <text class="request-time">报修时间：{{item.createdAt}}</text>
+        </view>
+      </view>
+    </block>
+    <view class="empty-tip" wx:else>
+      <text>暂无报修记录</text>
+    </view>
+  </view>
+</view> 

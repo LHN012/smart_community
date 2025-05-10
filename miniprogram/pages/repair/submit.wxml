@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="form-group">
+    <view class="form-item">
+      <view class="label">故障位置</view>
+      <input class="input" placeholder="请输入故障位置" model:value="{{location}}" />
+    </view>
+    
+    <view class="form-item">
+      <view class="label">故障描述</view>
+      <textarea class="textarea" placeholder="请详细描述故障情况，以便维修人员更好地了解问题" model:value="{{description}}" />
+    </view>
+  </view>
+
+  <view class="tips">
+    <view class="tips-title">温馨提示：</view>
+    <view class="tips-item">1. 请详细描述故障情况，以便维修人员更好地了解问题</view>
+    <view class="tips-item">2. 提交后请保持电话畅通，方便维修人员联系</view>
+    <view class="tips-item">3. 维修完成后，请及时确认维修结果</view>
+  </view>
+
+  <button class="submit-btn" bindtap="submitRequest">提交报修</button>
+</view> 

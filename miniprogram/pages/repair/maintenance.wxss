@@ -1,0 +1,90 @@
+.container {
+  padding: 20rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.submit-btn {
+  background-color: #07c160;
+  color: white;
+  font-size: 28rpx;
+  padding: 10rpx 30rpx;
+  border-radius: 8rpx;
+}
+
+.request-list {
+  width: 100%;
+}
+
+.request-item {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.request-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16rpx;
+}
+
+.request-status {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.pending {
+  background-color: #ffd591;
+  color: #873800;
+}
+
+.processing {
+  background-color: #91caff;
+  color: #003eb3;
+}
+
+.completed {
+  background-color: #b7eb8f;
+  color: #135200;
+}
+
+.request-content {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.request-desc {
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.request-location {
+  display: block;
+  margin-bottom: 10rpx;
+  color: #666;
+}
+
+.request-time {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  padding: 100rpx 0;
+} 

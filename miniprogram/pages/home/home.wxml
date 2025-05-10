@@ -8,7 +8,7 @@
       <image src="/images/notice.svg" mode="aspectFit"></image>
       <text>社区公告</text>
     </view>
-    <view class="grid-item" bindtap="navigateTo" data-url="/pages/repair/repair">
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/repair/maintenance">
       <image src="/images/repair.svg" mode="aspectFit"></image>
       <text>故障报修</text>
     </view>

@@ -9,9 +9,7 @@ spring:
     password: liuhaonan2001
   sql:
     init:
-      mode: always
-      schema-locations: classpath:db/schema.sql
-      continue-on-error: true
+      mode: never
   servlet:
     multipart:
       max-file-size: 10MB
@@ -27,7 +25,9 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath:mapper/**/*.xml
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.example.wx_smart_community.entity
   global-config:
     db-config:
       id-type: auto
@@ -39,7 +39,8 @@ jwt:
 logging:
   level:
     root: INFO
-    com.example.smart_community: DEBUG
+    com.example.wx_smart_community: DEBUG
+    com.baomidou.mybatisplus: DEBUG
 
 file:
   upload:
@@ -48,7 +49,7 @@ file:
 
 wx:
   appid: wx16f92eeeb5bedd54
-  secret: your_app_secret
+  secret: e11c14864cda8a26b133dc9ffe0ebb24
   pay:
     appid: wx16f92eeeb5bedd54
     mchid: your_mch_id
