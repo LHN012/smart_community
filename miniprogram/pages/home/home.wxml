@@ -32,9 +32,9 @@
       <image src="/images/complaint.svg" mode="aspectFit"></image>
       <text>投诉建议</text>
     </view>
-    <view class="grid-item" bindtap="navigateTo" data-url="/pages/activity/activity">
-      <image src="/images/activity.svg" mode="aspectFit"></image>
-      <text>社区活动</text>
+    <view class="grid-item" bindtap="navigateTo" data-url="/pages/pricing/pricing">
+      <image src="/images/pricing.svg" mode="aspectFit"></image>
+      <text>费用定价</text>
     </view>
   </view>
 </view> 

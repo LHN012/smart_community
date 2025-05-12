@@ -10,7 +10,7 @@
     "pages/recharge/recharge",
     "pages/profile/profile",
     "pages/complaint/complaint",
-    "pages/activity/activity"
+    "pages/pricing/pricing"
   ],
   "window": {
     "backgroundTextStyle": "light",

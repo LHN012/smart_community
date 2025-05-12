@@ -1,0 +1,79 @@
+<view class="pricing-container">
+  <view class="tab-container">
+    <view class="tab {{currentTab === 'current' ? 'active' : ''}}" bindtap="switchTab" data-tab="current">当前定价表</view>
+    <view class="tab {{currentTab === 'history' ? 'active' : ''}}" bindtap="switchTab" data-tab="history">往期定价表</view>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:if="{{currentTab === 'current'}}">
+    <view class="pricing-list" wx:if="{{!loading}}">
+      <block wx:if="{{currentPricingList.length > 0}}">
+        <block wx:for="{{currentPricingList}}" wx:key="type" wx:for-item="group">
+          <view class="pricing-group">
+            <view class="pricing-group-header">
+              <text class="pricing-type">{{group.type}}</text>
+              <text class="pricing-date">实施日期: {{group.effectiveDate}}</text>
+            </view>
+            <view wx:for="{{group.items}}" wx:key="id" wx:for-item="item" class="pricing-item">
+              <view class="pricing-header">
+                <text class="pricing-level">等级: {{item.level}}</text>
+              </view>
+              <view class="pricing-details">
+                <text class="pricing-price">定价: {{item.price}} {{group.unit}}</text>
+                <text class="pricing-usage" wx:if="{{item.startUsage !== null}}">起用量: {{item.startUsage}} {{group.type === '物业' ? '元' : '立方米'}}</text>
+                <text class="pricing-usage" wx:if="{{item.endUsage !== null}}">止用量: {{item.endUsage}} {{group.type === '物业' ? '元' : '立方米'}}</text>
+                <text class="pricing-cycle">缴费周期: {{item.paymentCycle === 0 ? '月' : '年'}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </block>
+      <view class="empty-tip" wx:else>
+        <text>暂无当前价格设置</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="search-container">
+      <picker mode="date" value="{{searchDate}}" bindchange="onDateChange" class="search-picker">
+        <view class="picker-text">{{searchDate || '请选择日期'}}</view>
+      </picker>
+      <view class="search-buttons">
+        <button bindtap="searchHistory" class="search-button">搜索</button>
+        <button bindtap="resetSearch" class="reset-button">重置</button>
+      </view>
+    </view>
+    <view class="pricing-list" wx:if="{{!loading}}">
+      <block wx:if="{{filteredHistoryList.length > 0}}">
+        <block wx:for="{{filteredHistoryList}}" wx:key="type" wx:for-item="group">
+          <view class="pricing-group">
+            <view class="pricing-group-header">
+              <text class="pricing-type">{{group.type}}</text>
+              <text class="pricing-date">实施日期: {{group.effectiveDate}}</text>
+              <text class="pricing-date">结束日期: {{group.endDate}}</text>
+            </view>
+            <view wx:for="{{group.items}}" wx:key="id" wx:for-item="item" class="pricing-item">
+              <view class="pricing-header">
+                <text class="pricing-level">等级: {{item.level}}</text>
+              </view>
+              <view class="pricing-details">
+                <text class="pricing-price">定价: {{item.price}} {{group.unit}}</text>
+                <text class="pricing-usage" wx:if="{{item.startUsage !== null}}">起用量: {{item.startUsage}} {{group.type === '物业' ? '元' : '立方米'}}</text>
+                <text class="pricing-usage" wx:if="{{item.endUsage !== null}}">止用量: {{item.endUsage}} {{group.type === '物业' ? '元' : '立方米'}}</text>
+                <text class="pricing-cycle">缴费周期: {{item.paymentCycle === 0 ? '月' : '年'}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </block>
+      <view class="empty-tip" wx:else>
+        <text>暂无历史价格设置</text>
+      </view>
+    </view>
+  </block>
+</view>
