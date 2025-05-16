@@ -2,7 +2,9 @@ package com.example.wx_smart_community.service.impl;
 
 import com.example.wx_smart_community.entity.GasMeterData;
 import com.example.wx_smart_community.service.GasMeterDataCollectionService;
+import com.example.wx_smart_community.service.GasLeakageDetectionService;
 import com.example.wx_smart_community.mapper.GasMeterDataMapper;
+import com.example.wx_smart_community.algorithm.GasLeakageDetector.DetectionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class GasMeterDataCollectionServiceImpl implements GasMeterDataCollection
     
     @Autowired
     private GasMeterDataMapper gasMeterDataMapper;
+
+    @Autowired
+    private GasLeakageDetectionService gasLeakageDetectionService;
     
     // 设备连接状态缓存
     private final Map<String, Boolean> deviceStatus = new ConcurrentHashMap<>();
@@ -101,9 +106,20 @@ public class GasMeterDataCollectionServiceImpl implements GasMeterDataCollection
                             gasMeterData.getFlowRate(),
                             gasMeterData.getPressure(),
                             gasMeterData.getTemperature());
-                        // TODO: 触发异常处理流程
+                        
+                        // 触发异常处理流程
+                        List<DetectionResult> results = gasLeakageDetectionService.detectLeakage(deviceId);
+                        if (!results.isEmpty()) {
+                            logger.warn("检测到{}个异常", results.size());
+                            for (DetectionResult result : results) {
+                                logger.warn("异常类型: {}, 描述: {}", result.getAlertType(), result.getDescription());
+                            }
+                        }
                     }
                 }
+                
+                // 无论是否报告异常，都执行一次检测
+                gasLeakageDetectionService.detectLeakage(deviceId);
             } else {
                 logger.error("设备{}数据验证失败", deviceId);
             }

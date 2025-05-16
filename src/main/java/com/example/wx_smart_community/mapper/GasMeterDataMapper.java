@@ -34,6 +34,11 @@ public interface GasMeterDataMapper {
                                                  @Param("endTime") LocalDateTime endTime);
 
     @Select("SELECT * FROM gas_meter_data WHERE device_id = #{deviceId} " +
+            "AND timestamp >= #{startTime} ORDER BY timestamp DESC")
+    List<GasMeterData> findHistoricalData(@Param("deviceId") String deviceId, 
+                                         @Param("startTime") LocalDateTime startTime);
+
+    @Select("SELECT * FROM gas_meter_data WHERE device_id = #{deviceId} " +
             "ORDER BY timestamp DESC LIMIT 1")
     GasMeterData findLatestByDeviceId(@Param("deviceId") String deviceId);
 
