@@ -22,25 +22,53 @@ spring:
       allow-credentials: true
       max-age: 3600
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
-  mapper-locations: classpath*:mapper/*.xml
+# MQTT配置
+mqtt:
+  broker:
+    url: tcp://localhost:1883
+  client:
+    id: smart_community_server
+    username: 
+    password: 
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.wx_smart_community.entity
-  global-config:
-    db-config:
-      id-type: auto
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-jwt:
-  secret: c21hcnRfY29tbXVuaXR5X2p3dF9zZWNyZXRfa2V5XzIwMjRfc2VjdXJlX2FuZF9sb25nX2Vub3VnaF9mb3JfaHM1MTI=
-  expiration: 86400
-
+# 日志配置
 logging:
   level:
     root: INFO
     com.example.wx_smart_community: DEBUG
     com.baomidou.mybatisplus: DEBUG
+  file:
+    name: logs/smart-community.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# 设备配置
+device:
+  # 设备离线判断时间（分钟）
+  offline-threshold: 10
+  # 数据采集间隔（毫秒）
+  collection-interval: 300000  # 5分钟
+  # 异常数据处理
+  abnormal:
+    # 是否自动关闭阀门
+    auto-close-valve: true
+    # 重试次数
+    retry-count: 3
+    # 重试间隔（毫秒）
+    retry-interval: 5000
+
+jwt:
+  secret: c21hcnRfY29tbXVuaXR5X2p3dF9zZWNyZXRfa2V5XzIwMjRfc2VjdXJlX2FuZF9sb25nX2Vub3VnaF9mb3JfaHM1MTI=
+  expiration: 86400
 
 file:
   upload:
