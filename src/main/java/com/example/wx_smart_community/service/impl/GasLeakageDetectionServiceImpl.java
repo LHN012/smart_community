@@ -5,11 +5,15 @@ import com.example.wx_smart_community.algorithm.GasLeakageDetector.DetectionResu
 import com.example.wx_smart_community.entity.GasMeterData;
 import com.example.wx_smart_community.entity.WarningRule;
 import com.example.wx_smart_community.entity.DeviceEvent;
+import com.example.wx_smart_community.entity.Notifications;
+import com.example.wx_smart_community.entity.NotificationReceiver;
 import com.example.wx_smart_community.service.GasLeakageDetectionService;
 import com.example.wx_smart_community.mapper.GasMeterDataMapper;
 import com.example.wx_smart_community.mapper.WarningRuleMapper;
 import com.example.wx_smart_community.mapper.DeviceMapper;
 import com.example.wx_smart_community.mapper.DeviceEventMapper;
+import com.example.wx_smart_community.mapper.NotificationsMapper;
+import com.example.wx_smart_community.mapper.NotificationReceiverMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +44,12 @@ public class GasLeakageDetectionServiceImpl implements GasLeakageDetectionServic
     
     @Autowired
     private DeviceEventMapper deviceEventMapper;
+    
+    @Autowired
+    private NotificationsMapper notificationsMapper;
+    
+    @Autowired
+    private NotificationReceiverMapper notificationReceiverMapper;
 
     @Override
     @Transactional
@@ -173,21 +183,80 @@ public class GasLeakageDetectionServiceImpl implements GasLeakageDetectionServic
     @Transactional
     public void saveDetectionResult(String deviceId, DetectionResult result) {
         logger.debug("保存设备{}的检测结果: {}", deviceId, result.getDescription());
-        DeviceEvent event = new DeviceEvent();
-        event.setDeviceId(deviceId);
-        event.setEventType("alert");  // 使用枚举类型中的alert
         
-        // 构建event_data JSON格式的详细信息
-        String eventData = String.format(
-            "{\"alertType\":\"%s\",\"description\":\"%s\",\"abnormalValue\":\"%s\"}",
-            result.getAlertType(),
-            result.getDescription(),
-            result.getAbnormalValue()
-        );
-        event.setEventData(eventData);
-        event.setTimestamp(result.getDetectionTime());
-        
-        deviceEventMapper.insert(event);
+        try {
+            // 1. 保存设备事件
+            DeviceEvent event = new DeviceEvent();
+            event.setDeviceId(deviceId);
+            event.setEventType("alert");
+            
+            String eventData = String.format(
+                "{\"alertType\":\"%s\",\"description\":\"%s\",\"abnormalValue\":\"%s\"}",
+                result.getAlertType(),
+                result.getDescription(),
+                result.getAbnormalValue()
+            );
+            event.setEventData(eventData);
+            event.setTimestamp(result.getDetectionTime());
+            
+            logger.info("正在保存设备事件...");
+            deviceEventMapper.insert(event);
+            logger.info("设备事件保存成功");
+            
+            // 2. 获取设备关联的房屋ID
+            logger.info("正在获取设备{}关联的房屋ID...", deviceId);
+            Integer houseId = deviceMapper.getHouseIdByDeviceId(deviceId);
+            logger.info("获取到房屋ID: {}", houseId);
+            
+            if (houseId == null) {
+                logger.error("设备{}未关联房屋", deviceId);
+                return;
+            }
+            
+            // 3. 创建通知
+            logger.info("正在创建通知...");
+            Notifications notification = new Notifications();
+            notification.setNotificationType("紧急通知");
+            notification.setTitle("燃气安全预警紧急通知");
+            notification.setContent("检测到设备" + deviceId + "出现异常：" + result.getDescription() + 
+                                "\n异常类型：" + result.getAlertType() + 
+                                "\n异常值：" + result.getAbnormalValue() + 
+                                "\n检测时间：" + result.getDetectionTime());
+            notification.setSenderId(1); // 默认系统发送者ID为1
+            notification.setReceiverType("特定房间业主");
+            notification.setReceiverId(houseId);
+            notification.setSendTime(LocalDateTime.now());
+            
+            logger.info("正在保存通知...");
+            int rows = notificationsMapper.insert(notification);
+            logger.info("通知保存结果: {} 行受影响", rows);
+            logger.info("生成的通知ID: {}", notification.getId());
+            
+            // 4. 获取该房屋绑定的所有用户ID
+            logger.info("正在获取房屋{}的所有用户ID...", houseId);
+            List<Integer> userIds = deviceMapper.getUserIdsByHouseId(houseId);
+            logger.info("获取到{}个用户", userIds.size());
+            
+            // 5. 为每个用户创建通知接收记录
+            logger.info("正在创建用户通知接收记录...");
+            for (Integer userId : userIds) {
+                try {
+                    NotificationReceiver receiver = new NotificationReceiver();
+                    receiver.setNotificationId(notification.getId());
+                    receiver.setReceiverUserId(userId);
+                    receiver.setIsRead(false);
+                    notificationReceiverMapper.insert(receiver);
+                    logger.info("已为用户{}创建通知接收记录", userId);
+                } catch (Exception e) {
+                    logger.error("为用户{}创建通知接收记录失败: {}", userId, e.getMessage(), e);
+                }
+            }
+            logger.info("通知接收记录创建完成");
+            
+        } catch (Exception e) {
+            logger.error("保存检测结果时发生错误: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override

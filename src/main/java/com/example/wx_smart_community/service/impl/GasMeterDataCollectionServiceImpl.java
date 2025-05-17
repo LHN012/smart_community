@@ -101,7 +101,7 @@ public class GasMeterDataCollectionServiceImpl implements GasMeterDataCollection
                 if (data.containsKey("data") && ((Map)data.get("data")).containsKey("is_abnormal")) {
                     boolean isAbnormal = (boolean) ((Map)data.get("data")).get("is_abnormal");
                     if (isAbnormal) {
-                        logger.warn("⚠️ 设备{}报告异常状态！", deviceId);
+                        logger.warn("设备{}报告异常状态！", deviceId);
                         logger.warn("异常数据: 流量={}, 压力={}, 温度={}", 
                             gasMeterData.getFlowRate(),
                             gasMeterData.getPressure(),
