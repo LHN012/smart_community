@@ -1,2 +1,53 @@
 <!--pages/notice/notice.wxml-->
-<text>pages/notice/notice.wxml</text>
+<view class="container">
+  <!-- 顶部类型选择 -->
+  <view class="type-filter">
+    <view class="filter-item {{currentType === 'all' ? 'active' : ''}}" bindtap="switchType" data-type="all">全部通知</view>
+    <view class="filter-item {{currentType === 'urgent' ? 'active' : ''}}" bindtap="switchType" data-type="urgent">紧急通知</view>
+    <view class="filter-item {{currentType === 'normal' ? 'active' : ''}}" bindtap="switchType" data-type="normal">普通通知</view>
+    <view class="filter-item {{currentType === 'activity' ? 'active' : ''}}" bindtap="switchType" data-type="activity">活动通知</view>
+    <view class="filter-item {{currentType === 'maintenance' ? 'active' : ''}}" bindtap="switchType" data-type="maintenance">维修通知</view>
+    <view class="filter-item {{currentType === 'payment' ? 'active' : ''}}" bindtap="switchType" data-type="payment">缴费通知</view>
+  </view>
+
+  <!-- 时间筛选 -->
+  <view class="time-filter">
+    <view class="filter-item {{timeRange === 'current' ? 'active' : ''}}" bindtap="switchTimeRange" data-range="current">本月通知</view>
+    <view class="filter-item {{timeRange === 'history' ? 'active' : ''}}" bindtap="switchTimeRange" data-range="history">往期通知</view>
+  </view>
+
+  <!-- 一键已读按钮 -->
+  <view class="read-all-btn" bindtap="markAllAsRead" wx:if="{{hasUnread}}">
+    一键已读
+  </view>
+
+  <!-- 通知列表 -->
+  <view class="notice-list">
+    <view class="notice-item {{item.notificationType}}" wx:for="{{notices}}" wx:key="id" bindtap="showNoticeDetail" data-id="{{item.id}}">
+      <view class="notice-header">
+        <text class="notice-title">{{item.title}}</text>
+        <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
+      </view>
+      <text class="notice-time">{{item.time}}</text>
+    </view>
+  </view>
+
+  <!-- 无通知提示 -->
+  <view class="empty-notice" wx:if="{{notices.length === 0}}">
+    暂无通知
+  </view>
+</view>
+
+<!-- 通知详情弹窗 -->
+<view class="notice-detail-modal" wx:if="{{showDetail}}">
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">{{currentNotice.title}}</text>
+      <text class="modal-close" bindtap="closeDetail">×</text>
+    </view>
+    <view class="modal-body">
+      <text class="detail-time">{{currentNotice.time}}</text>
+      <text class="detail-content">{{currentNotice.content}}</text>
+    </view>
+  </view>
+</view>

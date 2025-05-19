@@ -1,2 +1,70 @@
 <!--pages/usage/usage.wxml-->
-<text>pages/usage/usage.wxml</text>
+<view class="container">
+  <!-- 顶部标签页 -->
+  <view class="tabs">
+    <view class="tab {{currentTab === 'realtime' ? 'active' : ''}}" bindtap="switchTab" data-tab="realtime">
+      实时用量
+    </view>
+    <view class="tab {{currentTab === 'historical' ? 'active' : ''}}" bindtap="switchTab" data-tab="historical">
+      历史用量
+    </view>
+  </view>
+
+  <!-- 实时用量内容 -->
+  <view class="content" wx:if="{{currentTab === 'realtime'}}">
+    <block wx:for="{{houses}}" wx:key="houseId">
+      <view class="section">
+        <view class="section-title">实时用量 ({{item.name}})</view>
+        <view class="usage-list">
+          <view class="usage-item">
+            <text class="label">水表用量</text>
+            <text class="value">{{item.realtimeData.water ? item.realtimeData.water.totalVolume : '--'}}</text>
+            <text class="unit">吨</text>
+          </view>
+          <view class="usage-item">
+            <text class="label">电表用量</text>
+            <text class="value">{{item.realtimeData.electric ? item.realtimeData.electric.totalEnergy : '--'}}</text>
+            <text class="unit">度</text>
+          </view>
+          <view class="usage-item">
+            <text class="label">燃气用量</text>
+            <text class="value">{{item.realtimeData.gas ? item.realtimeData.gas.totalVolume : '--'}}</text>
+            <text class="unit">立方米</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 历史用量内容 -->
+  <view class="content" wx:if="{{currentTab === 'historical'}}">
+    <view class="section">
+      <view class="section-title">历史用量</view>
+      <view class="month-picker">
+        <picker mode="date" fields="month" value="{{currentMonth}}" bindchange="onMonthChange">
+          <view class="picker-content">
+            <text>{{currentMonth || '请选择月份'}}</text>
+            <text class="iconfont icon-arrow-down"></text>
+          </view>
+        </picker>
+      </view>
+      <view class="usage-list">
+        <view class="usage-item">
+          <text class="label">水表用量</text>
+          <text class="value">--</text>
+          <text class="unit">吨</text>
+        </view>
+        <view class="usage-item">
+          <text class="label">电表用量</text>
+          <text class="value">--</text>
+          <text class="unit">度</text>
+        </view>
+        <view class="usage-item">
+          <text class="label">燃气用量</text>
+          <text class="value">--</text>
+          <text class="unit">立方米</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

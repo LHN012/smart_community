@@ -1,5 +1,6 @@
 package com.example.wx_smart_community.mapper;
 
+import com.example.wx_smart_community.entity.Device;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -18,4 +19,7 @@ public interface DeviceMapper {
     
     @Select("SELECT user_id FROM userhouses WHERE house_id = #{houseId}")
     List<Integer> getUserIdsByHouseId(Integer houseId);
+
+    @Select("SELECT * FROM devices WHERE house_id = #{houseId}")
+    List<Device> findByHouseId(Integer houseId);
 } 
