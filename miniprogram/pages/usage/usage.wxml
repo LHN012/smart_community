@@ -37,34 +37,62 @@
   </view>
 
   <!-- 历史用量内容 -->
-  <view class="content" wx:if="{{currentTab === 'historical'}}">
-    <view class="section">
-      <view class="section-title">历史用量</view>
-      <view class="month-picker">
-        <picker mode="date" fields="month" value="{{currentMonth}}" bindchange="onMonthChange">
-          <view class="picker-content">
-            <text>{{currentMonth || '请选择月份'}}</text>
-            <text class="iconfont icon-arrow-down"></text>
+  <view class="historical-container" wx:if="{{currentTab === 'historical'}}">
+    <view class="filter-section">
+      <!-- 房屋选择 -->
+      <view class="filter-item">
+        <text class="label">选择房屋：</text>
+        <picker bindchange="onHouseChange" value="{{currentHouseIndex}}" range="{{houses}}" range-key="name">
+          <view class="picker">
+            {{houses[currentHouseIndex].name}}
           </view>
         </picker>
       </view>
-      <view class="usage-list">
-        <view class="usage-item">
-          <text class="label">水表用量</text>
-          <text class="value">--</text>
-          <text class="unit">吨</text>
+      
+      <!-- 类型选择 -->
+      <view class="filter-item">
+        <text class="label">使用类型：</text>
+        <picker bindchange="onTypeChange" value="{{currentTypeIndex}}" range="{{usageTypes}}">
+          <view class="picker">
+            {{usageTypes[currentTypeIndex]}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 月份选择 -->
+      <view class="filter-item">
+        <text class="label">选择月份：</text>
+        <picker mode="date" fields="month" value="{{currentMonth}}" bindchange="onMonthChange">
+          <view class="picker">
+            {{currentMonth || '全部'}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 查询按钮 -->
+      <view class="filter-item">
+        <button class="query-btn" bindtap="queryHistoricalData">查询</button>
+        <button class="reset-btn" bindtap="resetHistoricalData">重置</button>
+      </view>
+    </view>
+
+    <!-- 历史数据展示 -->
+    <view class="historical-data" wx:if="{{historicalData.length > 0}}">
+      <view class="data-item" wx:for="{{historicalData}}" wx:key="usage_id">
+        <view class="data-header">
+          <text class="month">{{item.month}}</text>
+          <text class="type">{{item.type}}</text>
         </view>
-        <view class="usage-item">
-          <text class="label">电表用量</text>
-          <text class="value">--</text>
-          <text class="unit">度</text>
-        </view>
-        <view class="usage-item">
-          <text class="label">燃气用量</text>
-          <text class="value">--</text>
-          <text class="unit">立方米</text>
+        <view class="data-content">
+          <text class="usage">用量：{{item.totalUsage}}</text>
+          <text class="unit">{{item.type === '电' ? 'kWh' : 'm³'}}</text>
         </view>
       </view>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="no-data" wx:else>
+      <text>暂无历史数据</text>
     </view>
   </view>
 </view>

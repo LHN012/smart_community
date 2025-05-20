@@ -2,22 +2,28 @@ package com.example.wx_smart_community.controller;
 
 import com.example.wx_smart_community.entity.Device;
 import com.example.wx_smart_community.entity.MeterData;
+import com.example.wx_smart_community.model.HistoricalUsage;
+import com.example.wx_smart_community.service.HistoricalUsageService;
 import com.example.wx_smart_community.service.UsageService;
 import com.example.wx_smart_community.utils.Result;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class UsageController {
     private static final Logger logger = LoggerFactory.getLogger(UsageController.class);
 
-    @Autowired
-    private UsageService usageService;
+    private final UsageService usageService;
+    private final HistoricalUsageService historicalUsageService;
 
     // 获取房屋设备列表
     @GetMapping("/devices/house/{houseId}")
@@ -48,5 +54,15 @@ public class UsageController {
             logger.error("获取设备数据失败", e);
             return Result.error("获取设备数据失败：" + e.getMessage());
         }
+    }
+
+    @GetMapping("/usage/historical")
+    public ResponseEntity<List<HistoricalUsage>> getHistoricalUsage(
+            @RequestParam Integer houseId,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String type) {
+        log.info("获取历史用量数据，houseId: {}, month: {}, type: {}", houseId, month, type);
+        List<HistoricalUsage> data = historicalUsageService.getHistoricalUsage(houseId, month, type);
+        return ResponseEntity.ok(data);
     }
 } 

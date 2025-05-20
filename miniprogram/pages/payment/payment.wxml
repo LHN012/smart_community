@@ -1,2 +1,144 @@
 <!--pages/payment/payment.wxml-->
-<text>pages/payment/payment.wxml</text>
+<view class="container">
+  <!-- 顶部标签页 -->
+  <view class="tabs">
+    <view class="tab {{currentTab === 'recharge' ? 'active' : ''}}" bindtap="switchTab" data-tab="recharge">
+      充值记录
+    </view>
+    <view class="tab {{currentTab === 'payment' ? 'active' : ''}}" bindtap="switchTab" data-tab="payment">
+      缴纳记录
+    </view>
+  </view>
+
+  <!-- 充值记录内容 -->
+  <view class="content" wx:if="{{currentTab === 'recharge'}}">
+    <view class="filter-section">
+      <!-- 房屋选择 -->
+      <view class="filter-item">
+        <text class="label">选择房屋：</text>
+        <picker bindchange="onHouseChange" value="{{currentHouseIndex}}" range="{{houses}}" range-key="name">
+          <view class="picker">
+            {{houses[currentHouseIndex].name}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 月份选择 -->
+      <view class="filter-item">
+        <text class="label">选择月份：</text>
+        <picker mode="date" fields="month" value="{{currentMonth}}" bindchange="onMonthChange">
+          <view class="picker">
+            {{currentMonth || '全部'}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 查询按钮 -->
+      <view class="filter-item">
+        <button class="query-btn" bindtap="queryRechargeRecords">查询</button>
+        <button class="reset-btn" bindtap="resetRechargeRecords">重置</button>
+      </view>
+    </view>
+
+    <!-- 充值记录列表 -->
+    <view class="record-list" wx:if="{{rechargeRecords.length > 0}}">
+      <view class="record-item" wx:for="{{rechargeRecords}}" wx:key="id">
+        <view class="record-header">
+          <text class="date">{{item.rechargeTime}}</text>
+          <text class="status success">成功</text>
+        </view>
+        <view class="record-content">
+          <view class="amount">
+            <text class="label">充值金额：</text>
+            <text class="value">¥{{item.rechargeAmount}}</text>
+          </view>
+          <view class="balance">
+            <text class="label">充值前余额：</text>
+            <text class="value">¥{{item.balanceBefore}}</text>
+          </view>
+          <view class="balance">
+            <text class="label">充值后余额：</text>
+            <text class="value">¥{{item.balanceAfter}}</text>
+          </view>
+          <view class="channel">
+            <text class="label">充值渠道：</text>
+            <text class="value">{{item.rechargeChannel}}</text>
+          </view>
+          <view class="method">
+            <text class="label">支付方式：</text>
+            <text class="value">{{item.paymentMethod}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="no-data" wx:else>
+      <text>暂无充值记录</text>
+    </view>
+  </view>
+
+  <!-- 缴纳记录内容 -->
+  <view class="content" wx:if="{{currentTab === 'payment'}}">
+    <view class="filter-section">
+      <!-- 房屋选择 -->
+      <view class="filter-item">
+        <text class="label">选择房屋：</text>
+        <picker bindchange="onHouseChange" value="{{currentHouseIndex}}" range="{{houses}}" range-key="name">
+          <view class="picker">
+            {{houses[currentHouseIndex].name}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 月份选择 -->
+      <view class="filter-item">
+        <text class="label">选择月份：</text>
+        <picker mode="date" fields="month" value="{{currentMonth}}" bindchange="onMonthChange">
+          <view class="picker">
+            {{currentMonth || '全部'}}
+          </view>
+        </picker>
+      </view>
+
+      <!-- 查询按钮 -->
+      <view class="filter-item">
+        <button class="query-btn" bindtap="queryPaymentRecords">查询</button>
+        <button class="reset-btn" bindtap="resetPaymentRecords">重置</button>
+      </view>
+    </view>
+
+    <!-- 缴纳记录列表 -->
+    <view class="record-list" wx:if="{{paymentRecords.length > 0}}">
+      <view class="record-item" wx:for="{{paymentRecords}}" wx:key="recordId">
+        <view class="record-header">
+          <text class="date">{{item.createDate}}</text>
+          <text class="status success">已支付</text>
+        </view>
+        <view class="record-content">
+          <view class="amount">
+            <text class="label">缴费金额：</text>
+            <text class="value">¥{{item.deductedAmount}}</text>
+          </view>
+          <view class="balance">
+            <text class="label">缴费前余额：</text>
+            <text class="value">¥{{item.balanceBefore}}</text>
+          </view>
+          <view class="balance">
+            <text class="label">缴费后余额：</text>
+            <text class="value">¥{{item.balanceAfter}}</text>
+          </view>
+          <view class="type">
+            <text class="label">费用类型：</text>
+            <text class="value">{{item.type}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="no-data" wx:else>
+      <text>暂无缴纳记录</text>
+    </view>
+  </view>
+</view>

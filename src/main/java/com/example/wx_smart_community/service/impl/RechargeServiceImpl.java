@@ -2,7 +2,7 @@ package com.example.wx_smart_community.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.wx_smart_community.mapper.RechargeRecordMapper;
-import com.example.wx_smart_community.model.RechargeRecord;
+import com.example.wx_smart_community.entity.RechargeRecord;
 import com.example.wx_smart_community.service.PayStrategy;
 import com.example.wx_smart_community.service.RechargeService;
 import lombok.RequiredArgsConstructor;

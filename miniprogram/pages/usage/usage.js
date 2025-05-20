@@ -18,7 +18,7 @@ Page({
     gasEc: {
       onInit: initChart
     },
-    currentTab: 'realtime',
+    currentTab: 'realtime', // 默认显示实时用量
     currentMonth: '',
     historicalData: [],
     deviceIds: {
@@ -34,7 +34,9 @@ Page({
       electric: null,
       water: null,
       gas: null
-    }
+    },
+    usageTypes: ['全部', '水', '电', '燃气'],
+    currentTypeIndex: 0,
   },
 
   /**
@@ -65,10 +67,16 @@ Page({
     // 加载用户绑定的房屋信息
     this.loadUserHouses(userInfo.userId)
 
-    // 设置当前月份
-    const now = new Date()
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    this.setData({ currentMonth })
+    // 启动定时器，每10秒更新一次实时数据
+    const timer = setInterval(() => {
+      if (this.data.currentTab === 'realtime' && this.data.houses.length > 0) {
+        const currentHouse = this.data.houses[this.data.currentHouseIndex]
+        if (currentHouse) {
+          this.loadHouseDevices(currentHouse)
+        }
+      }
+    }, 10000)
+    this.setData({ timer })
   },
 
   /**
@@ -105,6 +113,7 @@ Page({
     // 清除定时器
     if (this.data.timer) {
       clearInterval(this.data.timer)
+      this.setData({ timer: null })
     }
   },
 
@@ -160,12 +169,22 @@ Page({
                 
                 console.log('处理后的房屋列表:', processedHouses)
                 
-                this.setData({ houses: processedHouses }, () => {
+                this.setData({ 
+                    houses: processedHouses,
+                    currentHouseIndex: 0,
+                    houseId: processedHouses.length > 0 ? processedHouses[0].houseId : null,
+                    currentMonth: '' // 清空月份选择
+                }, () => {
                     console.log('房屋列表已更新到视图:', this.data.houses)
                     // 加载每个房屋的设备信息
                     processedHouses.forEach(house => {
                         this.loadHouseDevices(house)
                     })
+                    
+                    // 如果有房屋数据，自动加载第一个房屋的历史数据
+                    if (processedHouses.length > 0) {
+                        this.loadHistoricalData()
+                    }
                 })
             } else {
                 console.error('获取房屋列表失败: 返回数据格式不正确')
@@ -394,165 +413,113 @@ Page({
     });
   },
 
-  // 加载历史用量数据
-  loadHistoricalData() {
-    const { houseId } = this.data;
-    if (!houseId) {
-      console.log('houseId为空，无法加载历史数据');
-      return;
-    }
-
-    console.log('开始加载历史数据，houseId:', houseId);
-
-    wx.showLoading({
-      title: '加载中...',
-    });
-
-    // 获取当前月份
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    this.setData({ currentMonth });
-
-    wx.request({
-      url: `${app.globalData.baseUrl}/api/usage/historical`,
-      data: { 
-        houseId,
-        month: currentMonth
-      },
-      success: (res) => {
-        console.log('历史数据接口返回:', res.data);
-        if (res.data.code === 0) {
-          const historicalData = res.data.data || [];
-          console.log('处理后的历史数据:', historicalData);
-          
-          if (historicalData.length === 0) {
-            wx.showToast({
-              title: '暂无历史数据',
-              icon: 'none'
-            });
-          }
-          
-          // 按月份降序排序
-          historicalData.sort((a, b) => {
-            return new Date(b.month) - new Date(a.month);
-          });
-          
-          this.setData({ 
-            historicalData,
-            currentTab: 'historical' // 切换到历史用量标签
-          }, () => {
-            console.log('历史数据已更新到视图:', this.data.historicalData);
-          });
-        } else {
-          wx.showToast({
-            title: res.data.msg || '加载失败',
-            icon: 'none'
-          });
-        }
-      },
-      fail: (err) => {
-        console.error('加载历史数据失败:', err);
-        wx.showToast({
-          title: '网络错误',
-          icon: 'none'
-        });
-      },
-      complete: () => {
-        wx.hideLoading();
-      }
-    });
+  // 房屋选择变化
+  onHouseChange(e) {
+    const index = e.detail.value
+    this.setData({
+      currentHouseIndex: index,
+      houseId: this.data.houses[index].houseId
+    })
+    this.loadHistoricalData()
   },
 
-  // 按月份查询历史数据
-  queryHistoricalData() {
-    const { houseId, currentMonth } = this.data;
+  // 类型选择变化
+  onTypeChange(e) {
+    this.setData({
+        currentTypeIndex: e.detail.value
+    }, () => {
+        // 类型变化后自动查询
+        this.loadHistoricalData()
+    })
+  },
+
+  // 加载历史用量数据
+  loadHistoricalData() {
+    const { houseId, currentTypeIndex, usageTypes } = this.data
     if (!houseId) {
-      wx.showToast({
-        title: '请先选择房屋',
-        icon: 'none'
-      });
-      return;
+        console.log('houseId为空，无法加载历史数据')
+        return
     }
 
-    if (!currentMonth) {
-      wx.showToast({
-        title: '请选择月份',
-        icon: 'none'
-      });
-      return;
-    }
-
-    console.log('开始查询历史数据，houseId:', houseId, 'currentMonth:', currentMonth);
+    console.log('开始加载历史数据，houseId:', houseId)
 
     wx.showLoading({
-      title: '查询中...',
-    });
+        title: '加载中...',
+    })
 
     wx.request({
-      url: `${app.globalData.baseUrl}/api/usage/historical`,
-      data: {
-        houseId,
-        month: currentMonth
-      },
-      success: (res) => {
-        console.log('查询历史数据接口返回:', res.data);
-        if (res.data.code === 0) {
-          const historicalData = res.data.data || [];
-          console.log('处理后的历史数据:', historicalData);
-          
-          if (historicalData.length === 0) {
+        url: `${app.globalData.baseUrl}/api/usage/historical`,
+        data: { 
+            houseId,
+            type: currentTypeIndex === 0 ? '' : usageTypes[currentTypeIndex]
+        },
+        success: (res) => {
+            console.log('历史数据接口返回:', res.data)
+            if (res.data && Array.isArray(res.data)) {
+                const historicalData = res.data.map(item => ({
+                    ...item,
+                    month: item.month.split('T')[0] // 只保留日期部分
+                }))
+                console.log('处理后的历史数据:', historicalData)
+                
+                if (historicalData.length === 0) {
+                    wx.showToast({
+                        title: '暂无历史数据',
+                        icon: 'none'
+                    })
+                }
+                
+                // 按月份降序排序
+                historicalData.sort((a, b) => {
+                    return new Date(b.month) - new Date(a.month)
+                })
+                
+                this.setData({ 
+                    historicalData
+                }, () => {
+                    console.log('历史数据已更新到视图:', this.data.historicalData)
+                })
+            } else {
+                wx.showToast({
+                    title: '加载失败',
+                    icon: 'none'
+                })
+            }
+        },
+        fail: (err) => {
+            console.error('加载历史数据失败:', err)
             wx.showToast({
-              title: '该月份暂无数据',
-              icon: 'none'
-            });
-          }
-          
-          // 按月份降序排序
-          historicalData.sort((a, b) => {
-            return new Date(b.month) - new Date(a.month);
-          });
-          
-          this.setData({ historicalData }, () => {
-            console.log('历史数据已更新到视图:', this.data.historicalData);
-          });
-        } else {
-          wx.showToast({
-            title: res.data.msg || '查询失败',
-            icon: 'none'
-          });
+                title: '网络错误',
+                icon: 'none'
+            })
+        },
+        complete: () => {
+            wx.hideLoading()
         }
-      },
-      fail: (err) => {
-        console.error('查询历史数据失败:', err);
-        wx.showToast({
-          title: '网络错误',
-          icon: 'none'
-        });
-      },
-      complete: () => {
-        wx.hideLoading();
-      }
-    });
+    })
   },
 
   // 重置历史数据查询
   resetHistoricalData() {
-    const { houseId } = this.data;
+    const { houseId } = this.data
     if (!houseId) {
       wx.showToast({
         title: '请先选择房屋',
         icon: 'none'
-      });
-      return;
+      })
+      return
     }
 
-    // 重置月份选择
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    this.setData({ currentMonth });
+    // 重置月份选择和类型选择
+    const now = new Date()
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    this.setData({ 
+      currentMonth,
+      currentTypeIndex: 0
+    })
 
     // 重新加载所有历史数据
-    this.loadHistoricalData();
+    this.loadHistoricalData()
   },
 
   // 切换标签页
@@ -566,7 +533,80 @@ Page({
     this.setData({
       currentMonth: e.detail.value
     });
-  }
+  },
+
+  // 按月份查询历史数据
+  queryHistoricalData() {
+    const { houseId, currentMonth, currentTypeIndex, usageTypes } = this.data
+    if (!houseId) {
+      wx.showToast({
+        title: '请先选择房屋',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (!currentMonth) {
+      wx.showToast({
+        title: '请选择月份',
+        icon: 'none'
+      })
+      return
+    }
+
+    console.log('开始查询历史数据，houseId:', houseId, 'currentMonth:', currentMonth, 'type:', usageTypes[currentTypeIndex])
+
+    wx.showLoading({
+      title: '查询中...',
+    })
+
+    wx.request({
+      url: `${app.globalData.baseUrl}/api/usage/historical`,
+      data: {
+        houseId,
+        month: currentMonth,
+        type: currentTypeIndex === 0 ? '' : usageTypes[currentTypeIndex]
+      },
+      success: (res) => {
+        console.log('查询历史数据接口返回:', res.data)
+        if (res.data && Array.isArray(res.data)) {
+          const historicalData = res.data || []
+          console.log('处理后的历史数据:', historicalData)
+          
+          if (historicalData.length === 0) {
+            wx.showToast({
+              title: '该月份暂无数据',
+              icon: 'none'
+            })
+          }
+          
+          // 按月份降序排序
+          historicalData.sort((a, b) => {
+            return new Date(b.month) - new Date(a.month)
+          })
+          
+          this.setData({ historicalData }, () => {
+            console.log('历史数据已更新到视图:', this.data.historicalData)
+          })
+        } else {
+          wx.showToast({
+            title: '查询失败',
+            icon: 'none'
+          })
+        }
+      },
+      fail: (err) => {
+        console.error('查询历史数据失败:', err)
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none'
+        })
+      },
+      complete: () => {
+        wx.hideLoading()
+      }
+    })
+  },
 })
 
 // 初始化图表

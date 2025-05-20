@@ -1,6 +1,6 @@
 package com.example.wx_smart_community.controller;
 
-import com.example.wx_smart_community.model.RechargeRecord;
+import com.example.wx_smart_community.entity.RechargeRecord;
 import com.example.wx_smart_community.service.RechargeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
