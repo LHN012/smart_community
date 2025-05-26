@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -352,6 +353,37 @@ public class HouseController {
             logger.error("获取房屋列表失败", e);
             result.put("code", 500);
             result.put("msg", "获取房屋列表失败：" + e.getMessage());
+        }
+        return result;
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    @PostMapping("/extract")
+    public Map<String, Object> extractBalance(@RequestBody Map<String, Object> params) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Integer houseId = (Integer) params.get("houseId");
+            Integer userId = (Integer) params.get("userId");
+            Double extractAmount = ((Number) params.get("extractAmount")).doubleValue();
+
+            if (houseId == null || userId == null || extractAmount == null) {
+                result.put("code", 400);
+                result.put("msg", "参数不完整");
+                return result;
+            }
+
+            boolean success = housesService.extractBalance(houseId, userId, new BigDecimal(extractAmount));
+            if (success) {
+                result.put("code", 200);
+                result.put("msg", "提取成功");
+            } else {
+                result.put("code", 500);
+                result.put("msg", "提取失败");
+            }
+        } catch (Exception e) {
+            logger.error("提取房屋余额失败", e);
+            result.put("code", 500);
+            result.put("msg", "提取失败：" + e.getMessage());
         }
         return result;
     }

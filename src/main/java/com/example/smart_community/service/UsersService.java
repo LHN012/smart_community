@@ -36,4 +36,12 @@ public interface UsersService extends IService<Users> {
      * @return 普通用户列表
      */
     List<Users> listNormalUsers();
+
+    /**
+     * 根据条件查询普通用户列表
+     * @param keyword 关键词（用户名/姓名/邮箱）
+     * @param phoneNumber 手机号
+     * @return 用户列表
+     */
+    List<Users> listNormalUsersByCondition(String keyword, String phoneNumber);
 }

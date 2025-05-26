@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AdminManagement from '../components/AdminManagement.vue';
-import HouseManagement from '../components/HouseManagement.vue';
-import Login from '../components/Login.vue';
-import UserManagement from '../components/UserManagement.vue';
-import UserHouseManagement from '../components/UserHouseManagement.vue'
-import HouseInfoManagement from '../components/HouseInfoManagement.vue'
-import TransactionRecords from '../components/TransactionRecords.vue'
-import NotificationManagement from '../components/NotificationManagement.vue'
-import MaintenanceManagement from '../components/MaintenanceManagement.vue'
+import AdminManagement from '../views/AdminManagement.vue';
+import HouseManagement from '../views/HouseManagement.vue';
+import Login from '../views/Login.vue';
+import UserManagement from '../views/UserManagement.vue';
+import UserHouseManagement from '../views/UserHouseManagement.vue'
+import HouseInfoManagement from '../views/HouseInfoManagement.vue'
+import TransactionRecords from '../views/TransactionRecords.vue'
+import NotificationManagement from '../views/NotificationManagement.vue'
+import MaintenanceManagement from '../views/MaintenanceManagement.vue'
 
 const routes = [
   {

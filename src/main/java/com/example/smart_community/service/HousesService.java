@@ -3,6 +3,7 @@ package com.example.smart_community.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.smart_community.entity.Houses;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface HousesService extends IService<Houses> {
@@ -53,4 +54,9 @@ public interface HousesService extends IService<Houses> {
      * 房屋充值
      */
     boolean recharge(Integer houseId, Integer userId, Double rechargeAmount, String rechargeChannel, String paymentMethod);
+
+    /**
+     * 提取房屋余额
+     */
+    boolean extractBalance(Integer houseId, Integer userId, BigDecimal extractAmount);
 }    

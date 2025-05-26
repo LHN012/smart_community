@@ -49,6 +49,38 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return users;
     }
 
+    /**
+     * 根据条件查询普通用户列表
+     * @param keyword 关键词（用户名/姓名/邮箱）
+     * @param phoneNumber 手机号
+     * @return 用户列表
+     */
+    public List<Users> listNormalUsersByCondition(String keyword, String phoneNumber) {
+        logger.info("根据条件查询普通用户列表, keyword: {}, phoneNumber: {}", keyword, phoneNumber);
+        QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", 1);  // 1=普通用户
+        
+        // 添加关键词搜索条件
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            queryWrapper.and(wrapper -> wrapper
+                .like("username", keyword)
+                .or()
+                .like("real_name", keyword)
+                .or()
+                .like("email", keyword)
+            );
+        }
+        
+        // 添加手机号搜索条件
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            queryWrapper.like("phone_number", phoneNumber.trim());
+        }
+        
+        List<Users> users = list(queryWrapper);
+        logger.info("查询到{}个符合条件的普通用户", users.size());
+        return users;
+    }
+
     @Override
     public void saveUser(Users user) {
         // 调用 MyBatis-Plus 的 save 方法保存用户信息
