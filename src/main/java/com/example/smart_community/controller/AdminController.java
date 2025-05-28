@@ -34,10 +34,26 @@ public class AdminController {
     public Result<List<Users>> listNormalUsers() {
         try {
             List<Users> users = usersService.listNormalUsers();
+            logger.info("获取到普通用户列表，数量: {}", users.size());
+            users.forEach(user -> logger.info("用户ID: {}, 用户名: {}", user.getUserId(), user.getUsername()));
             return Result.success(users);
         } catch (Exception e) {
             logger.error("获取普通用户列表失败", e);
             return Result.error("获取普通用户列表失败: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/normal-users/search")
+    public Result<List<Users>> searchNormalUsers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String phoneNumber) {
+        try {
+            List<Users> users = usersService.listNormalUsersByCondition(keyword, phoneNumber);
+            logger.info("搜索到普通用户列表，数量: {}", users.size());
+            return Result.success(users);
+        } catch (Exception e) {
+            logger.error("搜索普通用户列表失败", e);
+            return Result.error("搜索普通用户列表失败: " + e.getMessage());
         }
     }
 

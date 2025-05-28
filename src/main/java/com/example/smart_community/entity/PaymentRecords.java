@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("paymentrecords")
+@TableName("payment_records")
 public class PaymentRecords {
     @TableId(type = IdType.AUTO)
     private Integer recordId;
@@ -18,11 +18,17 @@ public class PaymentRecords {
     
     private String type;
     
-    private BigDecimal amount;
+    private BigDecimal deductedAmount;
     
     private BigDecimal balanceBefore;
     
     private BigDecimal balanceAfter;
     
-    private LocalDateTime transactionTime;
+    private Integer userId;
+    
+    private LocalDateTime createDate;
+    
+    public enum PaymentType {
+        水, 电, 燃气, 物业, 提出余额
+    }
 } 
