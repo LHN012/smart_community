@@ -1,13 +1,34 @@
 <view class="container">
+  <image class="bg-image" src="/images/login.jpg" mode="aspectFill"></image>
   <view class="login-box">
     <view class="title">智慧社区</view>
+    <view class="slogan">智慧生活，便捷社区</view>
     <view class="input-group">
-      <input class="input" type="text" placeholder="用户名" model:value="{{username}}" />
-      <input class="input" type="password" placeholder="密码" model:value="{{password}}" />
+      <view class="input-wrapper">
+        <image class="input-icon" src="/images/user.svg" mode="aspectFit"></image>
+        <input class="input" type="text" placeholder="请输入用户名" model:value="{{username}}" />
+      </view>
+      <view class="input-wrapper">
+        <image class="input-icon" src="/images/lock.svg" mode="aspectFit"></image>
+        <input class="input" type="password" placeholder="请输入密码" model:value="{{password}}" />
+      </view>
     </view>
+    
+    <view class="agreement">
+      <checkbox-group bindchange="handleAgreementChange">
+        <label class="agreement-label">
+          <checkbox value="agree" color="#4fc3f7" />
+          <text class="agreement-text">我已阅读并同意</text>
+          <text class="agreement-link" bindtap="showServiceAgreement">《社区服务协议》</text>
+          <text class="agreement-text">和</text>
+          <text class="agreement-link" bindtap="showPrivacyAgreement">《隐私协议》</text>
+        </label>
+      </checkbox-group>
+    </view>
+
     <button class="login-btn" bindtap="handleLogin" loading="{{loading}}">登录</button>
     <button class="wechat-btn" bindtap="handleWechatLogin" loading="{{loading}}">
-      <image class="wechat-icon" src="http://localhost:8080/images/wechat.svg" mode="aspectFit"></image>
+      <image class="wechat-icon" src="/images/wechat.svg" mode="aspectFit"></image>
       微信一键登录
     </button>
   </view>

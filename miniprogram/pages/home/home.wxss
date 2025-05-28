@@ -1,46 +1,353 @@
 .container {
-  padding: 20rpx;
-  background-color: #f5f5f5;
+  padding: 30rpx;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400rpx;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(29, 78, 216, 0.05));
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+  z-index: 0;
 }
 
 .header {
-  padding: 30rpx;
-  background-color: #07c160;
-  border-radius: 20rpx;
+  padding: 40rpx 30rpx;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 24rpx;
   margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 30rpx rgba(59, 130, 246, 0.15);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  position: relative;
+}
+
+.title-decoration {
+  width: 60rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  position: relative;
+}
+
+.title-decoration.left {
+  margin-right: 20rpx;
+  transform: rotate(180deg);
+}
+
+.title-decoration.right {
+  margin-left: 20rpx;
+}
+
+.title-decoration::before {
+  content: '';
+  position: absolute;
+  width: 8rpx;
+  height: 8rpx;
+  background: #fff;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: pulse 2s infinite;
+}
+
+.title-decoration.left::before {
+  right: 0;
+}
+
+.title-decoration.right::before {
+  left: 0;
+}
+
+@keyframes pulse {
+  0% { transform: translateY(-50%) scale(1); opacity: 1; }
+  50% { transform: translateY(-50%) scale(1.5); opacity: 0.5; }
+  100% { transform: translateY(-50%) scale(1); opacity: 1; }
 }
 
 .welcome {
-  color: #fff;
-  font-size: 36rpx;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 20px;
 }
 
+.light-bulb {
+  font-size: 28px;
+  margin-right: 8px;
+  animation: glow 2s infinite;
+}
+
+.title-text {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #ffffff;
+  position: relative;
+  display: inline-block;
+  text-shadow: 0 0 20rpx rgba(255, 255, 255, 0.8);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.title-text::after {
+  content: '智慧社区';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #ffffff;
+  animation: glow 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 28rpx;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 2rpx;
+  margin-top: 8rpx;
+}
+
+.header-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 6s ease-in-out infinite;
+  backdrop-filter: blur(5px);
+}
+
+.circle-1 {
+  width: 120rpx;
+  height: 120rpx;
+  top: -20rpx;
+  left: 10%;
+  animation-delay: 0s;
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.circle-2 {
+  width: 80rpx;
+  height: 80rpx;
+  top: 40%;
+  right: 15%;
+  animation-delay: -2s;
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.circle-3 {
+  width: 60rpx;
+  height: 60rpx;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: -4s;
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20rpx) rotate(5deg); }
+}
+
+/* 天气和时间组件 */
+.info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.weather-icon {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.weather-text {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.time-info {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 功能模块网格 */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
-  padding: 20rpx;
+  gap: 24rpx;
+  padding: 0 10rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .grid-item {
-  background-color: #fff;
-  border-radius: 15rpx;
-  padding: 30rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx 20rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 16rpx rgba(59, 130, 246, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1rpx solid rgba(59, 130, 246, 0.1);
+}
+
+.grid-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(59, 130, 246, 0.06);
+  background: rgba(59, 130, 246, 0.02);
 }
 
 .grid-item image {
   width: 80rpx;
   height: 80rpx;
   margin-bottom: 20rpx;
+  transition: all 0.3s ease;
+  filter: invert(31%) sepia(98%) saturate(1352%) hue-rotate(202deg) brightness(97%) contrast(101%);
 }
 
 .grid-item text {
   font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+/* 社区公告 */
+.notice-bar {
+  margin: 30rpx 10rpx;
+  padding: 20rpx 30rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.notice-title {
+  font-size: 28rpx;
   color: #333;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.notice-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 数据统计卡片 */
+.stats-container {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin: 30rpx 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stats-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.stats-item:active {
+  transform: scale(0.98);
+}
+
+.stats-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 15%;
+  height: 70%;
+  width: 2rpx;
+  background: #eee;
+}
+
+.stats-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-icon image {
+  width: 48rpx;
+  height: 48rpx;
+  filter: invert(31%) sepia(98%) saturate(1352%) hue-rotate(202deg) brightness(97%) contrast(101%);
+}
+
+.stats-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.stats-label {
+  font-size: 26rpx;
+  color: #666;
 } 

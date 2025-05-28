@@ -152,8 +152,17 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> impleme
             userInfo.setRealName(user.getRealName());
             userInfo.setPhone(user.getPhoneNumber());
             userInfo.setEmail(user.getEmail());
+            userInfo.setRole(user.getRole());
+            userInfo.setAddress(user.getAddress());
+            userInfo.setCreatedAt(user.getCreatedAt());
+            // 使用数据库中的username字段
+            userInfo.setUsername(user.getUsername());
+        } else {
+            // 如果没有关联的用户信息，使用微信昵称作为用户名
+            userInfo.setUsername(wxUser.getNickname() != null ? wxUser.getNickname() : "微信用户");
         }
         
+        log.info("返回的用户信息: {}", userInfo);
         return userInfo;
     }
 

@@ -3,19 +3,33 @@ Page({
     username: '',
     password: '',
     loading: false,
-    wxLoginCode: '' // 存储微信登录code
+    wxLoginCode: '', // 存储微信登录code
+    isAgree: false // 是否同意协议
   },
 
-  onUsernameInput(e) {
+  handleInput(e) {
+    const { field } = e.currentTarget.dataset;
     this.setData({
-      username: e.detail.value
-    })
+      [field]: e.detail.value
+    });
   },
 
-  onPasswordInput(e) {
+  handleAgreementChange(e) {
     this.setData({
-      password: e.detail.value
-    })
+      isAgree: e.detail.value.length > 0
+    });
+  },
+
+  showServiceAgreement() {
+    wx.navigateTo({
+      url: '/pages/agreement/service'
+    });
+  },
+
+  showPrivacyAgreement() {
+    wx.navigateTo({
+      url: '/pages/agreement/privacy'
+    });
   },
 
   onLoad() {
@@ -27,9 +41,19 @@ Page({
   },
 
   handleLogin() {
-    if (!this.data.username || !this.data.password) {
+    const { username, password, isAgree } = this.data;
+    
+    if (!username || !password) {
       wx.showToast({
-        title: '请输入用户名和密码',
+        title: '请输入账号和密码',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (!isAgree) {
+      wx.showToast({
+        title: '请阅读并同意用户协议',
         icon: 'none'
       });
       return;
@@ -44,11 +68,10 @@ Page({
         'content-type': 'application/json'
       },
       data: {
-        username: this.data.username,
-        password: this.data.password
+        username: username,
+        password: password
       },
       success: (res) => {
-        console.log('登录响应:', res);
         if (res.statusCode === 200) {
           const { token, user } = res.data;
           if (!token || !user) {
@@ -61,8 +84,6 @@ Page({
           
           // 确保token格式正确
           const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-          console.log('保存的token:', formattedToken);
-          console.log('保存的用户信息:', user);
           
           // 保存token和用户信息
           wx.setStorageSync('token', formattedToken);
@@ -97,15 +118,21 @@ Page({
     });
   },
 
-  // 微信一键登录
   handleWechatLogin() {
+    if (!this.data.isAgree) {
+      wx.showToast({
+        title: '请阅读并同意用户协议',
+        icon: 'none'
+      });
+      return;
+    }
+
     this.setData({ loading: true });
     
     // 先获取用户信息
     wx.getUserProfile({
       desc: '用于完善用户资料',
       success: (profileRes) => {
-        console.log('获取用户信息成功:', profileRes);
         // 获取到用户信息后，再进行微信登录
         this.wxLogin(profileRes.userInfo);
       },
@@ -125,7 +152,6 @@ Page({
     wx.login({
       success: (res) => {
         if (res.code) {
-          console.log('获取到微信登录code:', res.code);
           // 发送code到后端
           wx.request({
             url: 'http://localhost:8080/api/wx/login',
@@ -135,26 +161,24 @@ Page({
             },
             data: {
               code: res.code,
-              userInfo: userInfo // 添加用户信息
+              userInfo: userInfo
             },
             success: (response) => {
-              console.log('微信登录响应:', response);
               if (response.statusCode === 200 && response.data) {
                 const { token, user } = response.data;
                 if (token && user) {
                   // 确保token格式正确
                   const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
                   
-                  // 合并用户信息，确保包含所有必要字段
+                  // 合并用户信息
                   const updatedUser = {
                     ...user,
                     nickname: userInfo.nickName,
                     avatarUrl: userInfo.avatarUrl,
-                    openid: user.openid,
-                    userId: user.userId
+                    username: user.username || userInfo.nickName // 确保username字段存在
                   };
                   
-                  console.log('保存的用户信息:', updatedUser);
+                  console.log('登录成功，用户信息：', updatedUser); // 添加日志
                   
                   // 保存token和用户信息
                   wx.setStorageSync('token', formattedToken);
@@ -184,7 +208,7 @@ Page({
               }
             },
             fail: (err) => {
-              console.error('微信登录失败:', err);
+              console.error('微信登录请求失败:', err);
               wx.showToast({
                 title: '网络错误',
                 icon: 'none'
@@ -195,8 +219,9 @@ Page({
             }
           });
         } else {
+          console.error('获取微信登录code失败');
           wx.showToast({
-            title: '获取微信登录凭证失败',
+            title: '微信登录失败',
             icon: 'none'
           });
           this.setData({ loading: false });
@@ -215,7 +240,6 @@ Page({
 
   // 跳转到首页
   navigateToHome() {
-    console.log('准备跳转到首页');
     wx.switchTab({
       url: '/pages/home/home',
       success: () => {
@@ -237,4 +261,4 @@ Page({
       }
     });
   }
-}) 
+}); 

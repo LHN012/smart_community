@@ -122,7 +122,9 @@ Page({
       'http://localhost:8080/api/user/info';
 
     // 准备请求参数
-    const requestData = isWxLogin ? { openid: userInfo.openid } : {};
+    const requestData = isWxLogin ? { userId: userInfo.userId } : {};
+
+    console.log('请求用户信息，参数:', requestData);
 
     // 发送请求
     wx.request({
@@ -138,6 +140,7 @@ Page({
         if (res.statusCode === 200 && res.data) {
           // 更新本地存储和页面数据
           const updatedUserInfo = { ...userInfo, ...res.data };
+          console.log('更新后的用户信息:', updatedUserInfo);
           wx.setStorageSync('userInfo', updatedUserInfo);
           this.setData({
             userInfo: updatedUserInfo
@@ -354,5 +357,42 @@ Page({
    */
   onShareAppMessage() {
 
+  },
+
+  // 处理退出登录
+  handleLogout() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 清除本地存储的登录信息
+          wx.removeStorageSync('token');
+          wx.removeStorageSync('userInfo');
+          
+          // 重置页面数据
+          this.setData({
+            userInfo: null,
+            isWxBound: false,
+            wxUserInfo: null,
+            loginType: ''
+          });
+
+          // 显示提示
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success',
+            duration: 1500
+          });
+
+          // 跳转到登录页
+          setTimeout(() => {
+            wx.redirectTo({
+              url: '/pages/login/login'
+            });
+          }, 1500);
+        }
+      }
+    });
   }
 })

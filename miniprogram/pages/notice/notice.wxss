@@ -3,52 +3,133 @@
   padding: 20rpx;
 }
 
+/* 类型选择器样式 */
 .type-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20rpx;
-  margin-bottom: 30rpx;
+  margin-bottom: 20rpx;
 }
 
+.picker-content {
+  background: #f5f5f5;
+  padding: 20rpx 30rpx;
+  border-radius: 8rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-arrow {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 时间筛选样式 */
 .time-filter {
   display: flex;
-  margin-bottom: 30rpx;
-  border-bottom: 1px solid #eee;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.filter-left {
+  display: flex;
 }
 
 .filter-item {
-  padding: 10rpx 20rpx;
-  border-radius: 30rpx;
-  font-size: 28rpx;
+  padding: 10rpx 30rpx;
+  margin-right: 20rpx;
   background: #f5f5f5;
+  border-radius: 6rpx;
+  font-size: 28rpx;
 }
 
 .filter-item.active {
   background: #007AFF;
-  color: white;
+  color: #fff;
 }
 
+.clear-btn {
+  padding: 10rpx 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 6rpx;
+}
+
+.clear-text {
+  font-size: 28rpx;
+  color: #007AFF;
+}
+
+.clear-btn:active {
+  opacity: 0.7;
+  background: #e5e5e5;
+}
+
+/* 一键已读按钮 */
 .read-all-btn {
-  width: fit-content;
-  padding: 10rpx 30rpx;
-  background: #007AFF;
-  color: white;
-  border-radius: 30rpx;
+  text-align: right;
+  color: #007AFF;
   font-size: 28rpx;
   margin-bottom: 20rpx;
 }
 
+/* 通知列表样式 */
 .notice-list {
   margin-top: 20rpx;
 }
 
 .notice-item {
+  display: flex;
   padding: 20rpx;
-  background: white;
-  border-radius: 10rpx;
+  background: #fff;
+  border-radius: 12rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
-  position: relative;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.notice-type-circle {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  background: #007AFF;
+}
+
+/* 通知类型背景色 */
+.notice-type-circle.urgent {
+  background: #FF3B30 !important;
+}
+
+.notice-type-circle.normal {
+  background: #34C759 !important;
+}
+
+.notice-type-circle.activity {
+  background: #FF9500 !important;
+}
+
+.notice-type-circle.maintenance {
+  background: #5856D6 !important;
+}
+
+.notice-type-circle.payment {
+  background: #007AFF !important;
+}
+
+.notice-type-circle.all {
+  background: #8E8E93 !important;
+}
+
+.notice-content {
+  flex: 1;
 }
 
 .notice-header {
@@ -59,47 +140,42 @@
 }
 
 .notice-title {
-  font-size: 32rpx;
-  font-weight: 500;
+  font-size: 30rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.notice-status {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.notice-status.unread {
+  background: #FF3B30;
+  color: #fff;
+}
+
+.notice-status.read {
+  background: #E5E5EA;
+  color: #8E8E93;
 }
 
 .notice-time {
   font-size: 24rpx;
-  color: #999;
+  color: #8E8E93;
 }
 
-.unread-dot {
-  width: 16rpx;
-  height: 16rpx;
-  background: #FF3B30;
-  border-radius: 50%;
-  position: absolute;
-  right: 20rpx;
-  top: 20rpx;
+/* 空状态提示 */
+.empty-notice {
+  text-align: center;
+  color: #8E8E93;
+  font-size: 28rpx;
+  margin-top: 100rpx;
 }
 
-/* 通知类型颜色 */
-.notice-item.urgent {
-  border-left: 8rpx solid #FF3B30;
-}
-
-.notice-item.normal {
-  border-left: 8rpx solid #007AFF;
-}
-
-.notice-item.activity {
-  border-left: 8rpx solid #34C759;
-}
-
-.notice-item.maintenance {
-  border-left: 8rpx solid #FF9500;
-}
-
-.notice-item.payment {
-  border-left: 8rpx solid #5856D6;
-}
-
-/* 通知详情弹窗 */
+/* 通知详情弹窗样式 */
 .notice-detail-modal {
   position: fixed;
   top: 0;
@@ -108,53 +184,48 @@
   bottom: 0;
   background: rgba(0,0,0,0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
+  justify-content: center;
 }
 
 .modal-content {
   width: 80%;
-  max-height: 80vh;
-  background: white;
-  border-radius: 20rpx;
-  padding: 30rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
 }
 
 .modal-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #E5E5EA;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
 }
 
 .modal-title {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: bold;
 }
 
 .modal-close {
   font-size: 40rpx;
-  color: #999;
-  padding: 10rpx;
+  color: #8E8E93;
+}
+
+.modal-body {
+  padding: 30rpx;
 }
 
 .detail-time {
   font-size: 24rpx;
-  color: #999;
-  display: block;
+  color: #8E8E93;
   margin-bottom: 20rpx;
+  display: block;
 }
 
 .detail-content {
-  font-size: 30rpx;
-  line-height: 1.6;
-  color: #333;
-}
-
-.empty-notice {
-  text-align: center;
-  color: #999;
-  margin-top: 100rpx;
   font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
 } 

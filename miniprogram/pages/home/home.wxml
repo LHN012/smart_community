@@ -1,8 +1,52 @@
 <view class="container">
   <view class="header">
-    <view class="welcome">欢迎使用智慧社区</view>
+    <view class="title-container">
+      <view class="title-decoration left"></view>
+      <view class="welcome">
+        <text class="title-text">智慧社区</text>
+      </view>
+      <view class="title-decoration right"></view>
+    </view>
+    <view class="subtitle">让生活更智能</view>
   </view>
-  
+
+  <!-- 天气和时间信息 -->
+  <view class="info-bar">
+    <view class="weather-info">
+      <image class="weather-icon" src="/images/weather.svg" mode="aspectFit"></image>
+      <view class="weather-text">{{weather.temperature}}°C {{weather.weather}}</view>
+    </view>
+    <view class="time-info">{{currentDate}} {{currentTime}}</view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-container">
+    <view class="stats-row">
+      <view class="stats-item" bindtap="navigateTo" data-url="/pages/notice/notice">
+        <view class="stats-icon">
+          <image src="/images/notice.svg" mode="aspectFit"></image>
+        </view>
+        <view class="stats-value">{{stats.unreadNotices}}</view>
+        <view class="stats-label">未读通知</view>
+      </view>
+      <view class="stats-item" bindtap="navigateTo" data-url="/pages/repair/repair">
+        <view class="stats-icon">
+          <image src="/images/repair.svg" mode="aspectFit"></image>
+        </view>
+        <view class="stats-value">{{stats.pendingRepairs}}</view>
+        <view class="stats-label">报修未处理</view>
+      </view>
+      <view class="stats-item" bindtap="navigateTo" data-url="/pages/payment/payment">
+        <view class="stats-icon">
+          <image src="/images/payment.svg" mode="aspectFit"></image>
+        </view>
+        <view class="stats-value">¥{{stats.balance}}</view>
+        <view class="stats-label">房屋余额</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能模块 -->
   <view class="grid-container">
     <view class="grid-item" bindtap="navigateTo" data-url="/pages/notice/notice">
       <image src="/images/notice.svg" mode="aspectFit"></image>
@@ -34,7 +78,7 @@
     </view>
     <view class="grid-item" bindtap="navigateTo" data-url="/pages/pricing/pricing">
       <image src="/images/pricing.svg" mode="aspectFit"></image>
-      <text>费用定价</text>
+      <text>费用标准</text>
     </view>
   </view>
 </view> 

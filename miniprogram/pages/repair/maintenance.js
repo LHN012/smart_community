@@ -18,6 +18,10 @@ Page({
     }
   },
 
+  onShow() {
+    this.loadRequests()
+  },
+
   navigateToSubmit() {
     wx.navigateTo({
       url: '/pages/repair/submit'
@@ -41,9 +45,22 @@ Page({
     const userId = this.data.userInfo.userId
     console.log('正在获取用户报修列表，用户ID：', userId)
 
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+      return
+    }
+
     wx.request({
       url: `http://localhost:8080/api/maintenance-requests/user/${userId}`,
       method: 'GET',
+      header: {
+        'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
       success: (res) => {
         console.log('请求响应：', res)
         if (res.statusCode === 200) {

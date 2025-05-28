@@ -7,6 +7,23 @@ Page({
    * 页面的初始数据
    */
   data: {
+    typeOptions: [
+      { label: '全部通知', value: 'all', initial: '全' },
+      { label: '紧急通知', value: 'urgent', initial: '急' },
+      { label: '普通通知', value: 'normal', initial: '普' },
+      { label: '活动通知', value: 'activity', initial: '活' },
+      { label: '维护通知', value: 'maintenance', initial: '维' },
+      { label: '缴费通知', value: 'payment', initial: '缴' }
+    ],
+    // 添加中文类型映射
+    typeMapping: {
+      '公告': 'normal',
+      '活动通知': 'activity',
+      '紧急通知': 'urgent',
+      '维护通知': 'maintenance',
+      '缴费通知': 'payment'
+    },
+    typeIndex: 0,
     currentType: 'all',
     timeRange: 'current',
     notices: [],
@@ -37,7 +54,7 @@ Page({
       return
     }
     this.setData({ userId: parseInt(userInfo.userId) })
-    this.fetchNotices()
+    this.loadNotices()
   },
 
   /**
@@ -91,16 +108,22 @@ Page({
 
   // 切换通知类型
   switchType(e) {
-    const type = e.currentTarget.dataset.type
-    this.setData({ currentType: type })
-    this.fetchNotices()
+    const index = e.detail.value;
+    const type = this.data.typeOptions[index].value;
+    this.setData({
+      typeIndex: index,
+      currentType: type
+    });
+    this.loadNotices();
   },
 
   // 切换时间范围
   switchTimeRange(e) {
-    const range = e.currentTarget.dataset.range
-    this.setData({ timeRange: range })
-    this.fetchNotices()
+    const range = e.currentTarget.dataset.range;
+    this.setData({
+      timeRange: range
+    });
+    this.loadNotices();
   },
 
   // 格式化时间
@@ -141,8 +164,8 @@ Page({
     return `${year}-${month}-${day} ${hours}:${minutes}`
   },
 
-  // 获取通知列表
-  fetchNotices() {
+  // 加载通知列表
+  loadNotices() {
     const { currentType, timeRange, userId } = this.data
     if (!userId) return
     
@@ -156,23 +179,31 @@ Page({
       },
       success: (res) => {
         if (res.data.code === 0) {
-          console.log('后端返回的通知数据:', res.data.data)
-          // 处理通知数据，确保is_read字段正确，并格式化时间
           const notices = res.data.data.map(notice => {
-            // 确保is_read字段为布尔值
             const isRead = notice.isRead === true || notice.is_read === true || 
                          notice.isRead === 1 || notice.is_read === 1;
+            
+            let notificationType = notice.notificationType || notice.type || 'normal';
+            const mappedType = this.data.typeMapping[notificationType] || 'normal';
+            const typeOption = this.data.typeOptions.find(opt => opt.value === mappedType);
+            
             return {
               ...notice,
               isRead,
-              time: this.formatTime(notice.sendTime)
-            }
-          })
-          console.log('处理后的通知数据:', notices)
+              time: this.formatTime(notice.sendTime),
+              notificationType: mappedType,
+              typeInitial: typeOption ? typeOption.initial : '通'
+            };
+          });
+          
+          // 检查是否有未读通知
+          const hasUnread = notices.some(notice => !notice.isRead);
+          console.log('未读状态:', hasUnread);
+          
           this.setData({
             notices,
-            hasUnread: notices.some(notice => !notice.isRead)
-          })
+            hasUnread
+          });
         }
       }
     })
@@ -235,18 +266,13 @@ Page({
       currentNotice: null
     })
     // 刷新列表
-    this.fetchNotices()
+    this.loadNotices()
   },
 
   // 标记单条通知为已读
   markAsRead(noticeId) {
     const { userId } = this.data
     if (!userId || !noticeId) return
-
-    console.log('发送标记已读请求，参数:', {
-      noticeId: parseInt(noticeId),
-      userId: parseInt(userId)
-    })
 
     // 立即更新本地状态
     const notices = this.data.notices.map(notice => {
@@ -255,9 +281,13 @@ Page({
       }
       return notice
     })
+    
+    // 更新未读状态
+    const hasUnread = notices.some(notice => !notice.isRead)
+    
     this.setData({
       notices,
-      hasUnread: notices.some(notice => !notice.isRead)
+      hasUnread
     })
 
     // 发送请求到服务器
@@ -348,8 +378,6 @@ Page({
     const { userId } = this.data
     if (!userId) return
 
-    console.log('开始检查未读通知数量，userId:', userId)
-
     wx.request({
       url: `${app.globalData.baseUrl}/api/notice/unread/count`,
       method: 'GET',
@@ -357,24 +385,19 @@ Page({
         userId: parseInt(userId)
       },
       success: (res) => {
-        console.log('获取未读数量响应:', res.data)
         if (res.data.code === 0) {
           const hasUnread = res.data.data > 0
-          console.log('未读状态:', hasUnread, '未读数量:', res.data.data)
+          console.log('未读数量:', res.data.data, '未读状态:', hasUnread);
           this.setData({ hasUnread })
           
-          // 先尝试隐藏小红点，确保状态一致
           wx.hideTabBarRedDot({
             index: 1,
             complete: () => {
-              // 如果有未读，再显示小红点
               if (hasUnread) {
-                console.log('显示小红点')
                 wx.showTabBarRedDot({
                   index: 1,
                   fail: (err) => {
                     console.error('显示小红点失败:', err)
-                    // 失败后重试一次
                     setTimeout(() => {
                       wx.showTabBarRedDot({
                         index: 1
@@ -382,17 +405,10 @@ Page({
                     }, 100)
                   }
                 })
-              } else {
-                console.log('保持小红点隐藏状态')
               }
             }
           })
-        } else {
-          console.error('获取未读数量失败:', res.data)
         }
-      },
-      fail: (err) => {
-        console.error('获取未读通知数量请求失败:', err)
       }
     })
   }
